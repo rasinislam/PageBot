@@ -74,10 +74,12 @@ const handleImageRecognition = async (apiUrl, prompt, imageUrl) => {
 };
 
 const fetchImageUrl = async (event, pageAccessToken) => {
-  if (event.message.reply_to && event.message.reply_to.mid) {
-    return await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
-  } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
-    return event.message.attachments[0].payload.url;
+  if (event && event.message) {
+    if (event.message.reply_to && event.message.reply_to.mid) {
+      return await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
+    } else if (event.message.attachments && event.message.attachments[0]?.type === 'image') {
+      return event.message.attachments[0].payload.url;
+    }
   }
   return "";
 };
