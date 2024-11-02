@@ -39,7 +39,7 @@ module.exports = {
       await sendConcatenatedMessage(senderId, message, pageAccessToken);
 
     } catch (error) {
-      console.error("Error in Gemini command:", error);
+      console.error("❌ Error sorry user", error);
       await sendError(senderId, error.message || "Something went wrong.", pageAccessToken);
     }
   }
