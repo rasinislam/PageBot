@@ -53,6 +53,22 @@ async function handleMessage(event, pageAccessToken) {
       return;
     }
 
+// Handling "gemini" command
+if (messageText === 'gemini') {
+  const lastImage = lastImageByUser.get(senderId);
+  if (lastImage) {
+    try {
+      await commands.get('gemini').execute(senderId, args, pageAccessToken, { message: { attachments: [{ type: 'image', payload: { url: lastImage } }] } });
+      lastImageByUser.delete(senderId); // Optionally clear the last image after processing
+    } catch (error) {
+      await sendMessage(senderId, { text: '❌ An error occurred while processing the Gemini command.' }, pageAccessToken);
+    }
+  } else {
+    await sendMessage(senderId, { text: '❌ Please send an image first, then type "gemini" to analyze it with Gemini.' }, pageAccessToken);
+  }
+  return;
+}
+
     // Handling "remini" command
 if (messageText === 'remini') {
   const lastImage = lastImageByUser.get(senderId);
