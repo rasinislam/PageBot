@@ -53,13 +53,13 @@ async function handleMessage(event, pageAccessToken) {
       return;
     }
 
-    // Handling "gemini" command
-    if (messageText.startsWith('gemini')) {
+    // Handling "ai" command
+    if (messageText.startsWith('ai')) {
       const lastImage = lastImageByUser.get(senderId);
       const args = messageText.split(/\s+/).slice(1);
 
       try {
-        await commands.get('gemini').execute(senderId, args, pageAccessToken, event, lastImage);
+        await commands.get('ai').execute(senderId, args, pageAccessToken, event, lastImage);
         lastImageByUser.delete(senderId);
       } catch (error) {
         await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
@@ -142,12 +142,12 @@ if (messageText === 'imgur') {
       return;
     }
 
-    const geminiCommand = commands.get('gemini');
+    const aiCommand = commands.get('ai');
     if (geminiCommand) {
       try {
-        await geminiCommand.execute(senderId, [messageText], pageAccessToken);
+        await aiCommand.execute(senderId, [messageText], pageAccessToken);
       } catch (error) {
-        console.error('Error executing gemini command:', error);
+        console.error('Error executing ai command:', error);
         sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
       }
     }
