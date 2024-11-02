@@ -6,58 +6,48 @@ module.exports = {
   description: "interact to gemini 1.5 flash vision",
   author: "developer",
 
-  async execute(senderId, args, pageAccessToken, event, imageUrl) {
-    const userPrompt = args.join(" ");
+  async execute(senderId, args, event, imageUrl, pageAccessToken) {
+    const userPrompt = (args.join(" ") || "Provide your question or description").trim();
+    await handleGeminiResponse(senderId, userPrompt, pageAccessToken, event, imageUrl);
+  },
+};
 
-    if (!userPrompt && !imageUrl) {
-      return sendMessage(senderId, { 
-        text: `❌ 𝗣𝗿𝗼𝘃𝗶𝗱𝗲𝗱 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻 𝗼𝗿 𝗶𝗺𝗮𝗴𝗲 𝗮𝗻𝗱 𝘁𝘆𝗽𝗲 𝘆𝗼𝘂𝗿 𝗱𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻 𝘁𝗼 𝗿𝗲𝗰𝗼𝗴𝗻𝗶𝘇𝗲...` 
-      }, pageAccessToken);
-    }
+const handleGeminiResponse = async (senderId, userPrompt, pageAccessToken, event, imageUrl) => {
+  const apiUrl = `https://joshweb.click/gemini`;
+  await sendMessage(senderId, { text: "⌛ Answering your question, please wait..." }, pageAccessToken);
 
-    sendMessage(senderId, { text: "⌛ 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻 𝗽𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁 𝗮 𝗺𝗼𝗺𝗲𝗻𝘁.." }, pageAccessToken);
-
-    try {
-      if (!imageUrl) {
-        if (event.message.reply_to && event.message.reply_to.mid) {
-          imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
-        } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
-          imageUrl = event.message.attachments[0].payload.url;
-        }
+  try {
+    if (!imageUrl) {
+      if (event.message.reply_to && event.message.reply_to.mid) {
+        imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
+      } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
+        imageUrl = event.message.attachments[0].payload.url;
       }
-
-      const apiUrl = `https://joshweb.click/gemini`;
-      const response = await handleImageRecognition(apiUrl, userPrompt, imageUrl);
-      const result = response.gemini;
-
-      // Get the current response time in Manila timezone
-      const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-
-      // Format the response message
-      const message = `𝗚𝗲𝗺𝗶𝗻𝗶 1.5 𝗙𝗹𝗮𝘀𝗵 𝗩𝗶𝘀𝗶𝗼𝗻 ♊\n━━━━━━━━━━━━━━━━━━
-${result}━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗧𝗶𝗺𝗲: ${responseTime}`;
-
-      await sendConcatenatedMessage(senderId, message, pageAccessToken);
-
-    } catch (error) {
-      console.error("Error in Gemini command:", error);
-      sendMessage(senderId, { text: `Error: ${error.message || "Something went wrong."}` }, pageAccessToken);
     }
+
+    const response = await handleImageRecognition(apiUrl, userPrompt, imageUrl);
+    const result = response.gemini;
+    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+    const formattedMessage = `Gemini 1.5 Flash Vision ♊\n━━━━━━━━━━━━━━━━━━\n${result}\n━━━━━━━━━━━━━━━━━━\n⏰ Response Time: ${responseTime}`;
+
+    await sendConcatenatedMessage(senderId, formattedMessage, pageAccessToken);
+  } catch (error) {
+    console.error("Error in Gemini command:", error);
+    await sendError(senderId, error.message || "Something went wrong.", pageAccessToken);
   }
 };
 
-async function handleImageRecognition(apiUrl, prompt, imageUrl) {
+const handleImageRecognition = async (apiUrl, prompt, imageUrl) => {
   const { data } = await axios.get(apiUrl, {
     params: {
       prompt,
       url: imageUrl || ""
     }
   });
-
   return data;
-}
+};
 
-async function getRepliedImage(mid, pageAccessToken) {
+const getRepliedImage = async (mid, pageAccessToken) => {
   const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
     params: { access_token: pageAccessToken }
   });
@@ -67,9 +57,9 @@ async function getRepliedImage(mid, pageAccessToken) {
   } else {
     return "";
   }
-}
+};
 
-async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
+const sendConcatenatedMessage = async (senderId, text, pageAccessToken) => {
   const maxMessageLength = 2000;
 
   if (text.length > maxMessageLength) {
@@ -82,12 +72,17 @@ async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
   } else {
     await sendMessage(senderId, { text }, pageAccessToken);
   }
-}
+};
 
-function splitMessageIntoChunks(message, chunkSize) {
+const splitMessageIntoChunks = (message, chunkSize) => {
   const chunks = [];
   for (let i = 0; i < message.length; i += chunkSize) {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
-}
+};
+
+const sendError = async (senderId, errorMessage, pageAccessToken) => {
+  const formattedMessage = `⁠(◍•ᴗ•◍) | Mocha Ai\n・───────────・\n${errorMessage}\n・──── >ᴗ< ─────・`;
+  await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
+};
