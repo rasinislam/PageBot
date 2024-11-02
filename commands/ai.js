@@ -5,7 +5,7 @@ const fs = require('fs');
 const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
-  name: 'ai',
+  name: 'gemini',
   description: 'interact with Gemini 1.5 Flash Vision',
   author: 'developer',
 
