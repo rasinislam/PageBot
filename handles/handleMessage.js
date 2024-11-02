@@ -142,12 +142,12 @@ if (messageText === 'imgur') {
       return;
     }
 
-    const aiCommand = commands.get('ai');
-    if (aiCommand) {
+    const geminiCommand = commands.get('gemini');
+    if (geminiCommand) {
       try {
-        await aiCommand.execute(senderId, [messageText], pageAccessToken);
+        await geminiCommand.execute(senderId, [messageText], pageAccessToken);
       } catch (error) {
-        console.error('Error executing Ai command:', error);
+        console.error('Error executing gemini command:', error);
         sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
       }
     }
