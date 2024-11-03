@@ -15,8 +15,6 @@ module.exports = {
       }, pageAccessToken);
     }
 
-    sendMessage(senderId, { text: "⌛ 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻 𝗽𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁 𝗮 𝗺𝗼𝗺𝗲𝗻𝘁.." }, pageAccessToken);
-
     try {
       if (!imageUrl) {
         if (event.message.reply_to && event.message.reply_to.mid) {
