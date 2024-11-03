@@ -53,20 +53,6 @@ async function handleMessage(event, pageAccessToken) {
       return;
     }
 
-    // Handling "ai" command
-    if (messageText.startsWith('ai')) {
-      const lastImage = lastImageByUser.get(senderId);
-      const args = messageText.split(/\s+/).slice(1);
-
-      try {
-        await commands.get('ai').execute(senderId, args, pageAccessToken, event, lastImage);
-        lastImageByUser.delete(senderId);
-      } catch (error) {
-        await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
-      }
-      return;
-    }
-
     // Handling "remini" command
 if (messageText === 'remini') {
   const lastImage = lastImageByUser.get(senderId);
@@ -100,6 +86,20 @@ if (messageText === '4k') {
   return;
 }
 
+    // Handling "gemini" command
+    if (messageText.startsWith('gemini')) {
+      const lastImage = lastImageByUser.get(senderId);
+      const args = messageText.split(/\s+/).slice(1);
+
+      try {
+        await commands.get('gemini').execute(senderId, args, pageAccessToken, event, lastImage);
+        lastImageByUser.delete(senderId);
+      } catch (error) {
+        await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
+      }
+      return;
+    }
+
 if (messageText === 'imgur') {
       const lastImage = lastImageByUser.get(senderId);
       const lastVideo = lastVideoByUser.get(senderId);
@@ -119,54 +119,37 @@ if (messageText === 'imgur') {
       return;
     }
 
-    
-const { sendMessage } = require('../handles/sendMessage');
-const commands = new Map();
-const prefix = "-"; // Set your command prefix
-
-// Register the gemini command
-const geminiCommand = require('./commands/gemini');
-commands.set(geminiCommand.name, geminiCommand);
-
-async function handleMessage(event, pageAccessToken) {
-  const senderId = event.sender.id;
-  const messageText = event.message?.text || "";
-
-  let commandName, args;
-  if (messageText.startsWith(prefix)) {
-    const argsArray = messageText.slice(prefix.length).split(' ');
-    commandName = argsArray.shift().toLowerCase();
-    args = argsArray;
-  } else {
-    const words = messageText.split(' ');
-    commandName = words.shift().toLowerCase();
-    args = words;
-  }
-
-  // Execute recognized command
-  if (commands.has(commandName)) {
-    const command = commands.get(commandName);
-    try {
-      await command.execute(senderId, args, pageAccessToken, event);
-    } catch (error) {
-      console.error(`Error executing command ${commandName}:`, error);
-      sendMessage(senderId, {
-        text: `There was an error executing the command "${commandName}". Please try again later.`,
-      }, pageAccessToken);
+    // Other command processing logic...
+    let commandName, args;
+    if (messageText.startsWith(prefix)) {
+      const argsArray = messageText.slice(prefix.length).split(' ');
+      commandName = argsArray.shift().toLowerCase();
+      args = argsArray;
+    } else {
+      const words = messageText.split(' ');
+      commandName = words.shift().toLowerCase();
+      args = words;
     }
-    return;
-  }
 
-  // Default to AI command if no specific command is matched
-  const aiCommand = commands.get('ai');
-  if (aiCommand) {
-    try {
-      await aiCommand.execute(senderId, [messageText], pageAccessToken);
-    } catch (error) {
-      console.error('Error executing AI command:', error);
-      sendMessage(senderId, {
-        text: 'There was an error processing your request.',
-      }, pageAccessToken);
+    if (commands.has(commandName)) {
+      const command = commands.get(commandName);
+      try {
+        await command.execute(senderId, args, pageAccessToken, sendMessage);
+      } catch (error) {
+        console.error(`Error executing command ${commandName}:`, error);
+        sendMessage(senderId, { text: `There was an error executing the command "${commandName}". Please try again later.` }, pageAccessToken);
+      }
+      return;
+    }
+
+    const geminiCommand = commands.get('jigsaw');
+    if (jigsawCommand) {
+      try {
+        await jigsawCommand.execute(senderId, [messageText], pageAccessToken);
+      } catch (error) {
+        console.error('Error executing gemini command:', error);
+        sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
+      }
     }
   } else if (event.message) {
     console.log('Received message without text');
