@@ -142,7 +142,7 @@ if (messageText === 'imgur') {
       return;
     }
 
-    const geminiCommand = commands.get('jigsaw');
+    const jigsawCommand = commands.get('jigsaw');
     if (jigsawCommand) {
       try {
         await jigsawCommand.execute(senderId, [messageText], pageAccessToken);
