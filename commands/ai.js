@@ -1,61 +1,56 @@
-const axios = require("axios");
+const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
+const fs = require('fs');
+
+const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
-  name: "ai",
-  description: "interact to gemini 1.5 flash vision",
-  author: "developer",
+  name: 'jigsaw',
+  description: 'ask to gpt4o assistant.',
+  author: 'developer',
 
-  async execute(senderId, args, event, imageUrl, pageAccessToken) {
-    const userPrompt = (args.join(" ") || "Provide your question or description").trim();
-    await handleGeminiResponse(senderId, userPrompt, pageAccessToken, event, imageUrl);
+  async execute(senderId, args) {
+    const pageAccessToken = token;
+
+    const prompt = args.join(" ").trim();
+    if (!prompt) {
+      return await sendMessage(senderId, { text: `❌ 𝗣𝗿𝗼𝘃𝗶𝗱𝗲 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻` }, pageAccessToken);
+    }
+
+    await handleChatResponse(senderId, prompt, pageAccessToken);
   },
 };
 
-const handleGeminiResponse = async (senderId, userPrompt, pageAccessToken, event, imageUrl) => {
-  const apiUrl = `https://joshweb.click/gemini`;
-  await sendMessage(senderId, { text: "⌛ Answering your question, please wait..." }, pageAccessToken);
+const handleChatResponse = async (senderId, input, pageAccessToken) => {
+  const apiUrl = "https://appjonellccapis.zapto.org/api/gpt4o-v2";
 
   try {
-    if (!imageUrl) {
-      if (event.message.reply_to && event.message.reply_to.mid) {
-        imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
-      } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
-        imageUrl = event.message.attachments[0].payload.url;
-      }
-    }
+    const { data } = await axios.get(apiUrl, { params: { prompt: input } });
+    const result = data.response;
 
-    const response = await handleImageRecognition(apiUrl, userPrompt, imageUrl);
-    const result = response.gemini;
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-    const formattedMessage = `Gemini 1.5 Flash Vision ♊\n━━━━━━━━━━━━━━━━━━\n${result}\n━━━━━━━━━━━━━━━━━━\n⏰ Response Time: ${responseTime}`;
+    const formattedResponse = `𝗠𝗘𝗧𝗔𝗟𝗟𝗜𝗖 𝗖𝗛𝗥𝗢𝗠𝗘 𝗩𝟐 𝗔𝗜 🤖\n━━━━━━━━━━━━━━━━━━\n𝗤𝘂𝗲𝘀𝘁𝗶𝗼𝗻: ${input}\n━━━━━━━━━━━━━━━━━━\n𝗔𝗻𝘀𝘄𝗲𝗿: ${result}\n━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝗱 𝗧𝗶𝗺𝗲: ${responseTime}`;
 
-    await sendConcatenatedMessage(senderId, formattedMessage, pageAccessToken);
-  } catch (error) {
-    console.error("Error in Gemini command:", error);
-    await sendError(senderId, error.message || "Something went wrong.", pageAccessToken);
-  }
-};
+    if (result.includes('TOOL_CALL: generateImage')) {
+      const imageUrlMatch = result.match(/\!\[.*?\]\((https:\/\/.*?)\)/);
 
-const handleImageRecognition = async (apiUrl, prompt, imageUrl) => {
-  const { data } = await axios.get(apiUrl, {
-    params: {
-      prompt,
-      url: imageUrl || ""
+      if (imageUrlMatch && imageUrlMatch[1]) {
+        const imageUrl = imageUrlMatch[1];
+        await sendMessage(senderId, {
+          attachment: {
+            type: 'image',
+            payload: { url: imageUrl }
+          }
+        }, pageAccessToken);
+      } else {
+        await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
+      }
+    } else {
+      await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
     }
-  });
-  return data;
-};
-
-const getRepliedImage = async (mid, pageAccessToken) => {
-  const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
-    params: { access_token: pageAccessToken }
-  });
-
-  if (data && data.data.length > 0 && data.data[0].image_data) {
-    return data.data[0].image_data.url;
-  } else {
-    return "";
+  } catch (error) {
+    console.error('Error while processing AI response:', error.message);
+    await sendError(senderId, '❌ Ahh sh1t error again.', pageAccessToken);
   }
 };
 
@@ -64,7 +59,6 @@ const sendConcatenatedMessage = async (senderId, text, pageAccessToken) => {
 
   if (text.length > maxMessageLength) {
     const messages = splitMessageIntoChunks(text, maxMessageLength);
-
     for (const message of messages) {
       await new Promise(resolve => setTimeout(resolve, 500));
       await sendMessage(senderId, { text: message }, pageAccessToken);
@@ -83,6 +77,8 @@ const splitMessageIntoChunks = (message, chunkSize) => {
 };
 
 const sendError = async (senderId, errorMessage, pageAccessToken) => {
-  const formattedMessage = `⁠(◍•ᴗ•◍) | Mocha Ai\n・───────────・\n${errorMessage}\n・──── >ᴗ< ─────・`;
+  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+  const formattedMessage = `𝗠𝗘𝗧𝗔𝗟𝗟𝗜𝗖 𝗖𝗛𝗥𝗢𝗠𝗘 𝗩𝟐 𝗔𝗜 🤖\n━━━━━━━━━━━━━━━━━━\n${errorMessage}\n━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝗱 𝗧𝗶𝗺𝗲: ${responseTime}`;
+
   await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
 };
