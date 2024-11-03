@@ -1,16 +1,53 @@
 const { sendMessage } = require('./sendMessage');
 
-const handlePostback = async (event, pageAccessToken) => {
-  const { id: senderId } = event.sender || {};
-  const { payload } = event.postback || {};
+const handlePostback = (event, pageAccessToken) => {
+  const sana = event.sender?.id;
+  const allbobo = event.postback?.payload;
 
-  if (!senderId || !payload) return console.error('Invalid postback event object');
+  // Get the current response time in Manila timezone
+  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
-  try {
-    await sendMessage(senderId, { text: `You sent a postback with payload: ${payload}` }, pageAccessToken);
-  } catch (err) {
-    console.error('Error sending postback response:', err.message || err);
+  if (sana && allbobo) {
+    if (allbobo === 'GET_STARTED_PAYLOAD') {
+      const combinedMessage = {
+        attachment: {
+          type: "template",
+          payload: {
+            template_type: "button",
+            text: `
+━━━━━━━━━━━━━━━━━━
+📆 𝗗𝗮𝘁𝗲 : ${responseTime}
+━━━━━━━━━━━━━━━━━━
+`,
+            buttons: [
+              {
+                type: "web_url",
+                url: "ch4nyyy.vercel.app",
+                title: "PRIVACY POLICY"
+              }
+            ]
+          }
+        },
+        quick_replies: [
+          {
+            content_type: "text",
+            title: "Help",
+            payload: "HELP_PAYLOAD"
+          }
+        ]
+      };
+
+      sendMessage(sana, combinedMessage, pageAccessToken);
+
+    } else {
+      sendMessage(sana, { text: `You sent a postback with payload: ${allbobo}` }, pageAccessToken);
+    }
+  } else {
+    console.error('Invalid postback event data');
   }
 };
 
 module.exports = { handlePostback };
+
+
+
