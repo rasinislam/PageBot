@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const axios = require('axios'); // Added axios for HTTP requests
 const { sendMessage } = require('./sendMessage');
@@ -8,11 +7,17 @@ const lastImageByUser = new Map(); // Store the last image sent by each user
 const lastVideoByUser = new Map(); // Store the last video sent by each user
 const prefix = '-';
 
-const commandFiles = fs.readdirSync(path.join(__dirname, '../commands')).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-  const command = require(`../commands/${file}`);
-  commands.set(command.name.toLowerCase(), command);
+// Dynamically import all command files from the ../commands directory
+async function loadCommands() {
+  const commandFiles = ['removebg', 'remini', '4k', 'ai', 'imgur', 'jigsaw']; // Add the command names as they appear in your ../commands folder
+
+  for (const file of commandFiles) {
+    const command = await import(`../commands/${file}.js`);
+    commands.set(command.name.toLowerCase(), command);
+  }
 }
+
+loadCommands(); // Call the function to load commands asynchronously
 
 async function handleMessage(event, pageAccessToken) {
   if (!event || !event.sender || !event.sender.id) {
@@ -54,37 +59,36 @@ async function handleMessage(event, pageAccessToken) {
     }
 
     // Handling "remini" command
-if (messageText === 'remini') {
-  const lastImage = lastImageByUser.get(senderId);
-  if (lastImage) {
-    try {
-      await commands.get('remini').execute(senderId, [], pageAccessToken, lastImage);
-      lastImageByUser.delete(senderId);
-    } catch (error) {
-      await sendMessage(senderId, { text: 'An error occurred while processing the image.' }, pageAccessToken);
+    if (messageText === 'remini') {
+      const lastImage = lastImageByUser.get(senderId);
+      if (lastImage) {
+        try {
+          await commands.get('remini').execute(senderId, [], pageAccessToken, lastImage);
+          lastImageByUser.delete(senderId);
+        } catch (error) {
+          await sendMessage(senderId, { text: 'An error occurred while processing the image.' }, pageAccessToken);
+        }
+      } else {
+        await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝗳𝗶𝗿𝘀𝘁, 𝘁𝗵𝗲𝗻 𝘁𝘆𝗽𝗲 "𝗿𝗲𝗺𝗶𝗻𝗶" 𝘁𝗼 𝗲𝗻𝗵𝗮𝗻𝗰𝗲 𝗶𝘁.' }, pageAccessToken);
+      }
+      return;
     }
-  } else {
-    await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝗳𝗶𝗿𝘀𝘁, 𝘁𝗵𝗲𝗻 𝘁𝘆𝗽𝗲 "𝗿𝗲𝗺𝗶𝗻𝗶" 𝘁𝗼 𝗲𝗻𝗵𝗮𝗻𝗰𝗲 𝗶𝘁.' }, pageAccessToken);
-  }
-  return;
-}
-// Handling "4k" command
-if (messageText === '4k') {
-  const lastImage = lastImageByUser.get(senderId); // Assuming this map stores the last image URL sent by the user
-  if (lastImage) {
-    try {
-      await commands.get('4k').execute(senderId, [], pageAccessToken, lastImage);
-      lastImageByUser.delete(senderId); // Clear the image after processing
-    } catch (error) {
-      await sendMessage(senderId, { text: 'An error occurred while upscaling the image.' }, pageAccessToken);
+
+    // Handling "4k" command
+    if (messageText === '4k') {
+      const lastImage = lastImageByUser.get(senderId); 
+      if (lastImage) {
+        try {
+          await commands.get('4k').execute(senderId, [], pageAccessToken, lastImage);
+          lastImageByUser.delete(senderId); 
+        } catch (error) {
+          await sendMessage(senderId, { text: 'An error occurred while upscaling the image.' }, pageAccessToken);
+        }
+      } else {
+        await sendMessage(senderId, { text: '❌ Please send an image first, then type "4k" to upscale it.' }, pageAccessToken);
+      }
+      return;
     }
-  } else {
-    await sendMessage(senderId, {
-      text: '❌ Please send an image first, then type "4k" to upscale it.'
-    }, pageAccessToken);
-  }
-  return;
-}
 
     // Handling "gemini" command
     if (messageText.startsWith('ai')) {
@@ -100,7 +104,8 @@ if (messageText === '4k') {
       return;
     }
 
-if (messageText === 'imgur') {
+    // Handling "imgur" command
+    if (messageText === 'imgur') {
       const lastImage = lastImageByUser.get(senderId);
       const lastVideo = lastVideoByUser.get(senderId);
       const mediaToUpload = lastImage || lastVideo;
@@ -157,5 +162,3 @@ if (messageText === 'imgur') {
     console.log('Received event without message');
   }
 }
-
-module.exports = { handleMessage };
