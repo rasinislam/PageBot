@@ -87,12 +87,12 @@ if (messageText === '4k') {
 }
 
     // Handling "gemini" command
-    if (messageText.startsWith('ai')) {
+    if (messageText.startsWith('gemini')) {
       const lastImage = lastImageByUser.get(senderId);
       const args = messageText.split(/\s+/).slice(1);
 
       try {
-        await commands.get('ai').execute(senderId, args, pageAccessToken, event, lastImage);
+        await commands.get('gemini').execute(senderId, args, pageAccessToken, event, lastImage);
         lastImageByUser.delete(senderId);
       } catch (error) {
         await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
@@ -142,12 +142,12 @@ if (messageText === 'imgur') {
       return;
     }
 
-    const jigsawCommand = commands.get('jigsaw');
-    if (jigsawCommand) {
+    const aiCommand = commands.get('ai');
+    if (aiCommand) {
       try {
-        await jigsawCommand.execute(senderId, [messageText], pageAccessToken);
+        await aiCommand.execute(senderId, [messageText], pageAccessToken);
       } catch (error) {
-        console.error('Error executing gemini command:', error);
+        console.error('Error executing Ai command:', error);
         sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
       }
     }
@@ -157,3 +157,5 @@ if (messageText === 'imgur') {
     console.log('Received event without message');
   }
 }
+
+module.exports = { handleMessage };
