@@ -52,7 +52,8 @@ module.exports = {
 
       // Format the response message
       const message = `━━━━━━━━━━━━━━━━━━
-${result}━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗧𝗶𝗺𝗲: ${responseTime}`;
+${result}
+━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗧𝗶𝗺𝗲: ${responseTime}`;
 
       await sendConcatenatedMessage(senderId, message, pageAccessToken);
 
