@@ -1,13 +1,19 @@
-const axios = require("axios");
+const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
+const fs = require('fs');
+
+const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
-  name: "jigsaw",
-  description: "interact to gemini 1.5 flash vision",
-  author: "developer",
+  name: 'jigsaw',
+  description: 'Interact with Gemini 1.5 Flash Vision',
+  usage: '-ai <your message>',
+  author: 'developer',
 
-  async execute(senderId, args, pageAccessToken, event, imageUrl) {
-    const userPrompt = args.join(" ");
+  async execute(senderId, args, event) {
+    const pageAccessToken = token;
+    const userPrompt = args.join(" ").trim();
+    let imageUrl = '';
 
     if (!userPrompt && !imageUrl) {
       return sendMessage(senderId, { 
@@ -16,6 +22,7 @@ module.exports = {
     }
 
     try {
+      // Check for an image if not provided in the args
       if (!imageUrl) {
         if (event.message.reply_to && event.message.reply_to.mid) {
           imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
@@ -61,10 +68,10 @@ ${result}
       console.error("Error in Gemini command:", error);
       sendMessage(senderId, { text: `Error: ${error.message || "Something went wrong."}` }, pageAccessToken);
     }
-  }
+  },
 };
 
-async function handleImageRecognition(apiUrl, prompt, imageUrl) {
+const handleImageRecognition = async (apiUrl, prompt, imageUrl) => {
   const { data } = await axios.get(apiUrl, {
     params: {
       prompt,
@@ -73,9 +80,9 @@ async function handleImageRecognition(apiUrl, prompt, imageUrl) {
   });
 
   return data;
-}
+};
 
-async function getRepliedImage(mid, pageAccessToken) {
+const getRepliedImage = async (mid, pageAccessToken) => {
   const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
     params: { access_token: pageAccessToken }
   });
@@ -85,9 +92,9 @@ async function getRepliedImage(mid, pageAccessToken) {
   } else {
     return "";
   }
-}
+};
 
-async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
+const sendConcatenatedMessage = async (senderId, text, pageAccessToken) => {
   const maxMessageLength = 2000;
 
   if (text.length > maxMessageLength) {
@@ -100,12 +107,12 @@ async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
   } else {
     await sendMessage(senderId, { text }, pageAccessToken);
   }
-}
+};
 
-function splitMessageIntoChunks(message, chunkSize) {
+const splitMessageIntoChunks = (message, chunkSize) => {
   const chunks = [];
   for (let i = 0; i < message.length; i += chunkSize) {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
-}
+};
