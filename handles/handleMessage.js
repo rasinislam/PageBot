@@ -87,25 +87,22 @@ if (messageText === '4k') {
 }
 
     // Handling "jigsaw" command
-if (messageText === 'jigsaw') {
+if (messageText.startsWith('jigsaw')) {
   const lastImage = lastImageByUser.get(senderId);
-  if (lastImage) {
-    try {
-      // Pass the last image to the 'jigsaw' command for processing
-      await commands.get('jigsaw').execute(senderId, [], event);
-      lastImageByUser.delete(senderId);  // Clear the last image after processing
-    } catch (error) {
-      // Handle any errors during execution
-      await sendMessage(senderId, { text: '❌ An error occurred while processing the image.' }, pageAccessToken);
-    }
-  } else {
-    // If no image has been sent by the user, prompt them to send one first
-    await sendMessage(senderId, { 
-      text: '❌ Please send an image first, then type "jigsaw" to process it.' 
-    }, pageAccessToken);
+  const args = messageText.split(/\s+/).slice(1); // Extract arguments from the message, excluding the command name.
+
+  try {
+    // Execute the 'jigsaw' command, passing the necessary parameters.
+    await commands.get('jigsaw').execute(senderId, args, event, lastImage);
+    // Clear the last image after processing
+    lastImageByUser.delete(senderId);
+  } catch (error) {
+    // Handle any errors that occur during command execution
+    await sendMessage(senderId, { text: '❌ An error occurred while processing the Jigsaw command.' }, pageAccessToken);
   }
   return;
 }
+
 
 
 if (messageText === 'imgur') {
