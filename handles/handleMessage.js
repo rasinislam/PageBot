@@ -86,13 +86,13 @@ if (messageText === '4k') {
   return;
 }
 
-    // Handling "jigsaw" command
-if (messageText.startsWith('jigsaw')) {
+    // Handling "ai" command
+if (messageText.startsWith('ai')) {
   const lastImage = lastImageByUser.get(senderId);
   const args = messageText.split(/\s+/).slice(1); // Extract arguments from the message, excluding the command name.
 
   try {
-    // Execute the 'jigsaw' command, passing the necessary parameters.
+    // Execute the 'ai' command, passing the necessary parameters.
     await commands.get('jigsaw').execute(senderId, args, event, lastImage);
     // Clear the last image after processing
     lastImageByUser.delete(senderId);
