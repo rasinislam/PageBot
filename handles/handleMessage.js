@@ -86,13 +86,13 @@ if (messageText === '4k') {
   return;
 }
 
-    // Handling "ai" command
-    if (messageText.startsWith('ai')) {
+    // Handling "jigsaw" command
+    if (messageText.startsWith('jigsaw')) {
       const lastImage = lastImageByUser.get(senderId);
       const args = messageText.split(/\s+/).slice(1);
 
       try {
-        await commands.get('ai').execute(senderId, args, pageAccessToken, event, lastImage);
+        await commands.get('jigsaw').execute(senderId, args, pageAccessToken, event, lastImage);
         lastImageByUser.delete(senderId);
       } catch (error) {
         await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
