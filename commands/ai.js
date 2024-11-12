@@ -1,53 +1,111 @@
-const axios = require('axios');
+const axios = require("axios");
 const { sendMessage } = require('../handles/sendMessage');
-const fs = require('fs');
-
-const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
-  name: 'jigsaw',
-  description: 'Interact with Gemini by replying to a photo with a prompt.',
-  usage: 'gemini <your prompt>',
-  author: 'gemini',
+  name: "jigsaw",
+  description: "interact to gemini 1.5 flash vision",
+  author: "developer",
 
-  async execute(senderId, args, event) {
-    const pageAccessToken = token;
-    const prompt = args.join(" ").trim();
+  async execute(senderId, args, pageAccessToken, event, imageUrl) {
+    const userPrompt = args.join(" ");
 
-    // Check if a prompt is provided
-    if (!prompt) {
-      return sendError(senderId, 'Please provide a prompt when using this command.', pageAccessToken);
+    if (!userPrompt && !imageUrl) {
+      return sendMessage(senderId, { 
+        text: `❌ 𝗣𝗿𝗼𝘃𝗶𝗱𝗲𝗱 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻 𝗼𝗿 𝗶𝗺𝗮𝗴𝗲 𝗮𝗻𝗱 𝘁𝘆𝗽𝗲 𝘆𝗼𝘂𝗿 𝗱𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻 𝘁𝗼 𝗿𝗲𝗰𝗼𝗴𝗻𝗶𝘇𝗲...` 
+      }, pageAccessToken);
     }
 
-    // Check if the message is a reply to a photo
-    if (event.type !== "message_reply" || !event.messageReply.attachments[0] || event.messageReply.attachments[0].type !== "photo") {
-      return sendError(senderId, 'Please reply to a photo with this command.', pageAccessToken);
+    try {
+      if (!imageUrl) {
+        if (event.message.reply_to && event.message.reply_to.mid) {
+          imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
+        } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
+          imageUrl = event.message.attachments[0].payload.url;
+        }
+      }
+
+      // Use both APIs
+      const apiUrlGemini = `https://joshweb.click/gemini`;
+      const apiUrlGpt4o = `https://appjonellccapis.zapto.org/api/gpt4o-v2`;
+
+      const responseGemini = await handleImageRecognition(apiUrlGemini, userPrompt, imageUrl);
+      const responseGpt4o = await handleImageRecognition(apiUrlGpt4o, userPrompt, imageUrl);
+
+      const result = responseGpt4o.gemini || responseGemini.gemini; // Prioritize response from the new API
+
+      // Check for image generation
+      if (result.includes('TOOL_CALL: generateImage')) {
+        const imageUrlMatch = result.match(/\!\[.*?\]\((https:\/\/.*?)\)/);
+        if (imageUrlMatch && imageUrlMatch[1]) {
+          const generatedImageUrl = imageUrlMatch[1];
+          await sendMessage(senderId, {
+            attachment: {
+              type: 'image',
+              payload: { url: generatedImageUrl }
+            }
+          }, pageAccessToken);
+        }
+      }
+
+      // Get the current response time in Manila timezone
+      const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+
+      // Format the response message
+      const message = `━━━━━━━━━━━━━━━━━━
+${result}
+━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗧𝗶𝗺𝗲: ${responseTime}`;
+
+      await sendConcatenatedMessage(senderId, message, pageAccessToken);
+
+    } catch (error) {
+      console.error("Error in Gemini command:", error);
+      sendMessage(senderId, { text: `Error: ${error.message || "Something went wrong."}` }, pageAccessToken);
     }
-
-    // Get the image URL from the replied-to photo
-    const url = encodeURIComponent(event.messageReply.attachments[0].url);
-    
-    // Process the Gemini API request
-    await handleGeminiResponse(senderId, prompt, url, pageAccessToken);
-  },
-};
-
-const handleGeminiResponse = async (senderId, prompt, url, pageAccessToken) => {
-  const apiUrl = `https://joshweb.click/gemini?prompt=${encodeURIComponent(prompt)}&url=${url}`;
-
-  try {
-    const { data } = await axios.get(apiUrl);
-    const responseText = data.gemini || 'No response from Gemini.';
-    const formattedMessage = `👽 GEMINI\n━━━━━━━━━━━━━━━━━━\n${responseText}\n━━━━━━━━━━━━━━━━━━`;
-
-    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
-  } catch (error) {
-    console.error('Error reaching the Gemini API:', error);
-    await sendError(senderId, 'An error occurred while processing your request.', pageAccessToken);
   }
 };
 
-const sendError = async (senderId, errorMessage, pageAccessToken) => {
-  const formattedMessage = `👽 GEMINI\n━━━━━━━━━━━━━━━━━━\n${errorMessage}\n━━━━━━━━━━━━━━━━━━`;
-  await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
-};
+async function handleImageRecognition(apiUrl, prompt, imageUrl) {
+  const { data } = await axios.get(apiUrl, {
+    params: {
+      prompt,
+      url: imageUrl || ""
+    }
+  });
+
+  return data;
+}
+
+async function getRepliedImage(mid, pageAccessToken) {
+  const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
+    params: { access_token: pageAccessToken }
+  });
+
+  if (data && data.data.length > 0 && data.data[0].image_data) {
+    return data.data[0].image_data.url;
+  } else {
+    return "";
+  }
+}
+
+async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
+  const maxMessageLength = 2000;
+
+  if (text.length > maxMessageLength) {
+    const messages = splitMessageIntoChunks(text, maxMessageLength);
+
+    for (const message of messages) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await sendMessage(senderId, { text: message }, pageAccessToken);
+    }
+  } else {
+    await sendMessage(senderId, { text }, pageAccessToken);
+  }
+}
+
+function splitMessageIntoChunks(message, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < message.length; i += chunkSize) {
+    chunks.push(message.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
