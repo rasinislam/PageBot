@@ -93,7 +93,7 @@ if (messageText.startsWith('ai')) {
 
   try {
     // Execute the 'ai' command, passing the necessary parameters.
-    await commands.get('jigsaw').execute(senderId, args, event, lastImage);
+    await commands.get('ai').execute(senderId, args, event, lastImage);
     // Clear the last image after processing
     lastImageByUser.delete(senderId);
   } catch (error) {
