@@ -6,79 +6,48 @@ const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
   name: 'jigsaw',
-  description: 'ask to gpt4o assistant.',
-  author: 'developer',
+  description: 'Interact with Gemini by replying to a photo with a prompt.',
+  usage: 'gemini <your prompt>',
+  author: 'gemini',
 
-  async execute(senderId, args) {
+  async execute(senderId, args, event) {
     const pageAccessToken = token;
-
     const prompt = args.join(" ").trim();
+
+    // Check if a prompt is provided
     if (!prompt) {
-      return await sendMessage(senderId, { text: `❌ 𝗣𝗿𝗼𝘃𝗶𝗱𝗲 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻` }, pageAccessToken);
+      return sendError(senderId, 'Please provide a prompt when using this command.', pageAccessToken);
     }
 
-    await handleChatResponse(senderId, prompt, pageAccessToken);
+    // Check if the message is a reply to a photo
+    if (event.type !== "message_reply" || !event.messageReply.attachments[0] || event.messageReply.attachments[0].type !== "photo") {
+      return sendError(senderId, 'Please reply to a photo with this command.', pageAccessToken);
+    }
+
+    // Get the image URL from the replied-to photo
+    const url = encodeURIComponent(event.messageReply.attachments[0].url);
+    
+    // Process the Gemini API request
+    await handleGeminiResponse(senderId, prompt, url, pageAccessToken);
   },
 };
 
-const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const apiUrl = "https://appjonellccapis.zapto.org/api/gpt4o-v2";
+const handleGeminiResponse = async (senderId, prompt, url, pageAccessToken) => {
+  const apiUrl = `https://joshweb.click/gemini?prompt=${encodeURIComponent(prompt)}&url=${url}`;
 
   try {
-    const { data } = await axios.get(apiUrl, { params: { prompt: input } });
-    const result = data.response;
+    const { data } = await axios.get(apiUrl);
+    const responseText = data.gemini || 'No response from Gemini.';
+    const formattedMessage = `👽 GEMINI\n━━━━━━━━━━━━━━━━━━\n${responseText}\n━━━━━━━━━━━━━━━━━━`;
 
-    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-    const formattedResponse = `━━━━━━━━━━━━━━━━━━\n𝗤𝘂𝗲𝘀𝘁𝗶𝗼𝗻: ${input}\n━━━━━━━━━━━━━━━━━━\n𝗔𝗻𝘀𝘄𝗲𝗿: ${result}\n━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝗱 𝗧𝗶𝗺𝗲: ${responseTime}`;
-
-    if (result.includes('TOOL_CALL: generateImage')) {
-      const imageUrlMatch = result.match(/\!\[.*?\]\((https:\/\/.*?)\)/);
-
-      if (imageUrlMatch && imageUrlMatch[1]) {
-        const imageUrl = imageUrlMatch[1];
-        await sendMessage(senderId, {
-          attachment: {
-            type: 'image',
-            payload: { url: imageUrl }
-          }
-        }, pageAccessToken);
-      } else {
-        await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
-      }
-    } else {
-      await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
-    }
+    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   } catch (error) {
-    console.error('Error while processing AI response:', error.message);
-    await sendError(senderId, '❌ Ahh sh1t error again.', pageAccessToken);
+    console.error('Error reaching the Gemini API:', error);
+    await sendError(senderId, 'An error occurred while processing your request.', pageAccessToken);
   }
-};
-
-const sendConcatenatedMessage = async (senderId, text, pageAccessToken) => {
-  const maxMessageLength = 2000;
-
-  if (text.length > maxMessageLength) {
-    const messages = splitMessageIntoChunks(text, maxMessageLength);
-    for (const message of messages) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      await sendMessage(senderId, { text: message }, pageAccessToken);
-    }
-  } else {
-    await sendMessage(senderId, { text }, pageAccessToken);
-  }
-};
-
-const splitMessageIntoChunks = (message, chunkSize) => {
-  const chunks = [];
-  for (let i = 0; i < message.length; i += chunkSize) {
-    chunks.push(message.slice(i, i + chunkSize));
-  }
-  return chunks;
 };
 
 const sendError = async (senderId, errorMessage, pageAccessToken) => {
-  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-  const formattedMessage = `━━━━━━━━━━━━━━━━━━\n${errorMessage}\n━━━━━━━━━━━━━━━━━━\n⏰ 𝗥𝗲𝘀𝗽𝗼𝗻𝗱 𝗧𝗶𝗺𝗲: ${responseTime}`;
-
+  const formattedMessage = `👽 GEMINI\n━━━━━━━━━━━━━━━━━━\n${errorMessage}\n━━━━━━━━━━━━━━━━━━`;
   await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
 };
