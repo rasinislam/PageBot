@@ -92,17 +92,19 @@ if (messageText.startsWith('ai')) {
   const args = messageText.split(/\s+/).slice(1); // Extract arguments from the message, excluding the command name.
 
   try {
-    // Execute the 'ai' command, passing the necessary parameters.
-    await commands.get('ai').execute(senderId, args, event, lastImage);
-    // Clear the last image after processing
-    lastImageByUser.delete(senderId);
-  } catch (error) {
-    // Handle any errors that occur during command execution
-    await sendMessage(senderId, { text: '❌ An error occurred while processing the Jigsaw command.' }, pageAccessToken);
-  }
-  return;
-}
+        // Handling "gemini" command
+    if (messageText.startsWith('gemini')) {
+      const lastImage = lastImageByUser.get(senderId);
+      const args = messageText.split(/\s+/).slice(1);
 
+      try {
+        await commands.get('gemini').execute(senderId, args, pageAccessToken, event, lastImage);
+        lastImageByUser.delete(senderId);
+      } catch (error) {
+        await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
+      }
+      return;
+    }
 
 
 if (messageText === 'imgur') {
