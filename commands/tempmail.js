@@ -29,14 +29,7 @@ module.exports = {
           console.error("❌ | Failed to generate email", error.message);
           return sendMessage(senderId, { text: `❌ | Failed to generate email. Error: ${error.message}` }, pageAccessToken);
         }
-        return sendMessage(senderId, { text: `generated email ✉️: ${email}\nhow to get code:\n
-ex: tempmail inbox example@rteet.com
-also you can create your  tempmail
-example:\n\n
-example@rteet.com
-example@1secmail.com
-example@1secmail.net
-example@1secmail.org` }, pageAccessToken);
+        return sendMessage(senderId, { text: `generated email ✉️: ${email}` }, pageAccessToken);
       } else if (command === 'inbox' && args.length === 2) {
         const email = args[1];
         if (!email) {
