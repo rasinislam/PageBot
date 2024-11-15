@@ -27,10 +27,22 @@ pinterest - cat - 10\n
 
 remini - send image first and type remini\n
 
-tempmail - create or inbox <email>\n
-
 tokengetter - <email> | <password>
 (new acc)\n
+
+create your tempmail
+
+example:
+
+toolbot@rteet.com
+toolbot@1secmail.com
+toolbot@1secmail.net
+toolbot@1secmail.org
+
+hot retrieve code?
+
+example:
+tempmail inbox toolbot@1secmail.org
 ━━━━━━━━━━━━━━━━━━
 📆 𝗗𝗮𝘁𝗲 : ${responseTime}
 ━━━━━━━━━━━━━━━━━━
