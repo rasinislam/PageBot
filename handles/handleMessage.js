@@ -59,40 +59,18 @@ if (messageText === 'remini') {
   if (lastImage) {
     try {
       await commands.get('remini').execute(senderId, [], pageAccessToken, lastImage);
-      lastImageByUser.delete(senderId);
+      lastImageByUser.delete(senderId); // Remove the image from memory after processing
     } catch (error) {
-      await sendMessage(senderId, { text: 'An error occurred while processing the image.' }, pageAccessToken);
+      await sendMessage(senderId, { text: '❌ 𝗔𝗻 𝗲𝗿𝗿𝗼𝗿 𝗼𝗰𝗰𝘂𝗿𝗿𝗲𝗱 𝘄𝗵𝗶𝗹𝗲 𝗽𝗿𝗼𝗰𝗲𝘀𝘀𝗶𝗻𝗴 𝘁𝗵𝗲 𝗶𝗺𝗮𝗴𝗲.' }, pageAccessToken);
     }
   } else {
     await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝗳𝗶𝗿𝘀𝘁, 𝘁𝗵𝗲𝗻 𝘁𝘆𝗽𝗲 "𝗿𝗲𝗺𝗶𝗻𝗶" 𝘁𝗼 𝗲𝗻𝗵𝗮𝗻𝗰𝗲 𝗶𝘁.' }, pageAccessToken);
   }
   return;
 }
-// Handling "4k" command
-if (messageText === '4k') {
-  const lastImage = lastImageByUser.get(senderId); // Assuming this map stores the last image URL sent by the user
-  if (lastImage) {
-    try {
-      await commands.get('4k').execute(senderId, [], pageAccessToken, lastImage);
-      lastImageByUser.delete(senderId); // Clear the image after processing
-    } catch (error) {
-      await sendMessage(senderId, { text: 'An error occurred while upscaling the image.' }, pageAccessToken);
-    }
-  } else {
-    await sendMessage(senderId, {
-      text: '❌ Please send an image first, then type "4k" to upscale it.'
-    }, pageAccessToken);
-  }
-  return;
-}
 
-    // Handling "ai" command
-if (messageText.startsWith('ai')) {
-  const lastImage = lastImageByUser.get(senderId);
-  const args = messageText.split(/\s+/).slice(1); // Extract arguments from the message, excluding the command name.
 
-  try {
-        // Handling "gemini" command
+    // Handling "gemini" command
     if (messageText.startsWith('gemini')) {
       const lastImage = lastImageByUser.get(senderId);
       const args = messageText.split(/\s+/).slice(1);
@@ -105,7 +83,6 @@ if (messageText.startsWith('ai')) {
       }
       return;
     }
-
 
 if (messageText === 'imgur') {
       const lastImage = lastImageByUser.get(senderId);
@@ -125,6 +102,22 @@ if (messageText === 'imgur') {
       }
       return;
     }
+// Handling "upscale" command
+if (messageText === 'upscale') {
+  const lastImage = lastImageByUser.get(senderId);
+  if (lastImage) {
+    try {
+      await commands.get('upscale').execute(senderId, [], pageAccessToken, lastImage);
+      lastImageByUser.delete(senderId);
+    } catch (error) {
+      await sendMessage(senderId, { text: 'An error occurred while processing the image.' }, pageAccessToken);
+    }
+  } else {
+    await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝗳𝗶𝗿𝘀𝘁, 𝘁𝗵𝗲𝗻 𝘁𝘆𝗽𝗲 "𝘂𝗽𝘀𝗰𝗮𝗹𝗲" 𝘁𝗼 𝘂𝗽𝘀𝗰𝗮𝗹𝗲 𝗶𝘁.' }, pageAccessToken);
+  }
+  return;
+}
+
 
     // Other command processing logic...
     let commandName, args;
@@ -149,10 +142,10 @@ if (messageText === 'imgur') {
       return;
     }
 
-    const jigsawCommand = commands.get('jigsaw');
-    if (jigsawCommand) {
+    const aiCommand = commands.get('ai');
+    if (aiCommand) {
       try {
-        await jigsawCommand.execute(senderId, [messageText], pageAccessToken);
+        await aiCommand.execute(senderId, [messageText], pageAccessToken);
       } catch (error) {
         console.error('Error executing Ai command:', error);
         sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
