@@ -13,7 +13,7 @@ module.exports = {
     const [cmd, email] = args;
     if (cmd === 'create') {
       const domain = domains[Math.floor(Math.random() * domains.length)];
-      return sendMessage(senderId, { text: `generated email ✉️: ${Math.random().toString(36).slice(2, 10)}@${domain}\n\n to get code\nexample: tempmail inbox meow@1secmail.com` }, pageAccessToken);
+      return sendMessage(senderId, { text: `generated email ✉️: ${Math.random().toString(36).slice(2, 10)}@${domain}\n\nto get code\nexample: tempmail inbox meow@1secmail.com` }, pageAccessToken);
     }
 
     if (cmd === 'inbox' && email && domains.some(d => email.endsWith(`@${d}`))) {
