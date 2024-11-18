@@ -19,30 +19,18 @@ Hello, Welccome to Tool Bot Page 🤖🔧\n
 
 Here avail tool commands & usage:\n
 
-nglspam - <usn> <mess> <amount>\n
+• nglspam - username mess amount\n
 
-imagine - <prompt> to generate image\n
+• pinterest - cat - 10\n
 
-pinterest - cat - 10\n
+° remini - send image first and type remini\n
 
-remini - send image first and type remini\n
-
-tokengetter - <email> | <password>
+• tokengetter - email | password
 (new acc)\n
 
-create your tempmail
+•tempmail create (to generate email)
+•tempmail inbox your_emai
 
-example:
-
-toolbot@rteet.com
-toolbot@1secmail.com
-toolbot@1secmail.net
-toolbot@1secmail.org
-
-hot retrieve code?
-
-example:
-tempmail inbox toolbot@1secmail.org
 ━━━━━━━━━━━━━━━━━━
 📆 𝗗𝗮𝘁𝗲 : ${responseTime}
 ━━━━━━━━━━━━━━━━━━
