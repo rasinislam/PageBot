@@ -5,8 +5,8 @@ const domains = ["rteet.com", "1secmail.com", "1secmail.org", "1secmail.net"];
 
 module.exports = {
   name: 'tempmail',
-  description: 'tempmail cen (generate email) & genmail inbox <email>',
-  usage: 'genmail create (to generate email) genmail inbox your_email (to get code',
+  description: 'tempmail create (generate email) & tempmail inbox your_email (to get code)',
+  usage: 'tempmail create (to generate email) tempnmail inbox your_email (to get code)',
   author: 'developer',
 
   async execute(senderId, args, pageAccessToken) {
@@ -24,7 +24,7 @@ module.exports = {
 
         const { id, from, subject, date } = inbox[0];
         const { textBody } = (await axios.get(`https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${id}`)).data;
-        return sendMessage(senderId, { text: `📬 | Latest Email:\nFrom: ${from}\nSubject: ${subject}\nDate: ${date}\n\nContent:\n${textBody}` }, pageAccessToken);
+        return sendMessage(senderId, { text: `📬 | Tool Bot Inbox:\nFrom: ${from}\nSubject: ${subject}\nDate: ${date}\n\nContent:\n${textBody}` }, pageAccessToken);
       } catch {
         return sendMessage(senderId, { text: 'Error: Unable to fetch inbox or email content.' }, pageAccessToken);
       }
