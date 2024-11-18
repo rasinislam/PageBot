@@ -20,7 +20,7 @@ module.exports = {
       try {
         const [username, domain] = email.split('@');
         const inbox = (await axios.get(`https://www.1secmail.com/api/v1/?action=getMessages&login=${username}&domain=${domain}`)).data;
-        if (!inbox.length) return sendMessage(senderId, { text: 'Inbox is empty.' }, pageAccessToken);
+        if (!inbox.length) return sendMessage(senderId, { text: '❌ Inbox is empty please resend your email.' }, pageAccessToken);
 
         const { id, from, subject, date } = inbox[0];
         const { textBody } = (await axios.get(`https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${id}`)).data;
