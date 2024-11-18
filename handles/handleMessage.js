@@ -70,19 +70,18 @@ if (messageText === 'remini') {
 }
 
 
-    // Handling "gemini" command
-    if (messageText.startsWith('gemini')) {
-      const lastImage = lastImageByUser.get(senderId);
-      const args = messageText.split(/\s+/).slice(1);
+    // Handling "ai" command
+if (messageText.startsWith('ai')) {
+  const args = messageText.split(/\s+/).slice(1);
 
-      try {
-        await commands.get('gemini').execute(senderId, args, pageAccessToken, event, lastImage);
-        lastImageByUser.delete(senderId);
-      } catch (error) {
-        await sendMessage(senderId, { text: 'An error occurred while processing the Gemini command.' }, pageAccessToken);
-      }
-      return;
-    }
+  try {
+    await commands.get('ai').execute(senderId, args);
+  } catch (error) {
+    await sendMessage(senderId, { text: 'An error occurred while processing the AI command.' }, pageAccessToken);
+  }
+  return;
+}
+
 
 if (messageText === 'imgur') {
       const lastImage = lastImageByUser.get(senderId);
