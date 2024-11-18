@@ -19,7 +19,7 @@ Hello, Welccome to Tool Bot Page 🤖🔧\n
 
 Here avail tool commands & usage:\n
 
-• nglspam - username mess amount\n
+• nglspam - username message amount\n
 
 • pinterest - cat - 10\n
 
@@ -29,7 +29,7 @@ Here avail tool commands & usage:\n
 (new acc)\n
 
 •tempmail create (to generate email)
-•tempmail inbox your_emai (to get code)
+•tempmail inbox your_email (to get code)
 
 ━━━━━━━━━━━━━━━━━━
 📆 𝗗𝗮𝘁𝗲 : ${responseTime}
