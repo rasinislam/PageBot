@@ -29,7 +29,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const result = data.response;
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-    const formattedResponse = `━━━━━━━━━━━━━━━━━━\n𝗤𝘂𝗲𝘀𝘁𝗶𝗼𝗻: ${input}\n━━━━━━━━━━━━━━━━━━\n𝗔𝗻𝘀𝘄𝗲𝗿: ${result}\n━━━━━━━━━━━━━━━━━━`;
+    const formattedResponse = `${result}`;
 
     if (result.includes('TOOL_CALL: generateImage')) {
       const imageUrlMatch = result.match(/\!\[.*?\]\((https:\/\/.*?)\)/);
@@ -78,7 +78,7 @@ const splitMessageIntoChunks = (message, chunkSize) => {
 
 const sendError = async (senderId, errorMessage, pageAccessToken) => {
   const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-  const formattedMessage = `━━━━━━━━━━━━━━━━━━\n${errorMessage}\n━━━━━━━━━━━━━━━━━━`;
+  const formattedMessage = `${errorMessage}`;
 
   await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
 };
