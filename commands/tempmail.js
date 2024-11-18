@@ -5,8 +5,8 @@ const domains = ["rteet.com", "1secmail.com", "1secmail.org", "1secmail.net"];
 
 module.exports = {
   name: 'tempmail',
-  description: 'genmail gen (generate email) & genmail inbox <email>',
-  usage: 'genmail gen or genmail inbox <email>',
+  description: 'tempmail cen (generate email) & genmail inbox <email>',
+  usage: 'genmail create (to generate email) genmail inbox your_email (to get code',
   author: 'developer',
 
   async execute(senderId, args, pageAccessToken) {
@@ -30,6 +30,6 @@ module.exports = {
       }
     }
 
-    sendMessage(senderId, { text: 'Invalid usage. Use genmail gen or genmail inbox <email>' }, pageAccessToken);
+    sendMessage(senderId, { text: 'Invalid usage. Use tempnmail create (to generate email) tempmail inbox your_email (to get code)' }, pageAccessToken);
   },
 };
