@@ -29,7 +29,7 @@ Here avail tool commands & usage:\n
 (new acc)\n
 
 •tempmail create (to generate email)
-•tempmail inbox your_emai
+•tempmail inbox your_emai (to get code)
 
 ━━━━━━━━━━━━━━━━━━
 📆 𝗗𝗮𝘁𝗲 : ${responseTime}
