@@ -15,19 +15,15 @@ const handlePostback = (event, pageAccessToken) => {
           payload: {
             template_type: "button",
             text: `
-🌟Hello, Welcome to Tool Bot Page 🤖🛠️\n
+🌟 Hello, Welcome to Tool Bot Page 🤖🛠️\n
 
 Here avail tool commands & usage:\n
 
 🛠️ • nglspam - username message amount\n
-      ex:       malik    hi      10
 🛠️ • pinterest - cat - 10\n
-
 🛠️ ° remini - send image first and type remini\n
-
 🛠️ • tokengetter - email | password
      (new acc)\n
-
 🛠️ • tempmail create (to generate email)
 🛠️ • tempmail inbox your_email (to get code)
 
