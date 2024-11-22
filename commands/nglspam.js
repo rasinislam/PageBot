@@ -10,7 +10,7 @@ module.exports = {
     const message = args.slice(1, args.length - 1).join(' ');
 
     if (!username || !message || isNaN(amount) || amount <= 0) {
-      return sendMessage(senderId, { text: 'Usage: nglspam [username] [message] [amount]' }, pageAccessToken);
+      return sendMessage(senderId, { text: 'Usage: nglspam username message amount' }, pageAccessToken);
     }
 
     sendMessage(senderId, { text: '⚙️ Processing your request to send messages to NGL username...' }, pageAccessToken);
