@@ -9,7 +9,7 @@ module.exports = {
     const [username, password] = input.split(" | ");
 
     if (!username || !password) {
-      return sendMessage(senderId, { text: "Usage: tokengetter <username> | <password>" }, pageAccessToken);
+      return sendMessage(senderId, { text: "Usage: tokengetter username| password" }, pageAccessToken);
     }
 
     try {
@@ -30,7 +30,6 @@ EAAAAU TOKEN:
 COOKIES:
 ➜ ${cookies}
 `;
-
       sendMessage(senderId, { text: message }, pageAccessToken);
 
     } catch (error) {
