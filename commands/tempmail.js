@@ -19,11 +19,11 @@ module.exports = {
     if (cmd === 'inbox' && email && domains.some(d => email.endsWith(`@${d}`))) {
       try {
         const [username, domain] = email.split('@');
-        const inbox = (await axios.get(`https://mekumi-rest-api.onrender.com/api/secmailgen?q=${username}&domain=${domain}`)).data;
+        const inbox = (await axios.get(`https://www.1secmail.com/api/v1/?action=getMessages&login=${username}&domain=${domain} `)).data;
         if (!inbox.length) return sendMessage(senderId, { text: '❌ Inbox is empty please resend your email.' }, pageAccessToken);
 
         const { id, from, subject, date } = inbox[0];
-        const { textBody } = (await axios.get(`https://mekumi-rest-api.onrender.com/api/secmailbox?q=${username}&domain=${domain}&id=${id}`)).data;
+        const { textBody } = (await axios.get(`https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${id}`)).data;
         return sendMessage(senderId, { text: `📬 | Tool Bot Inbox:\nFrom: ${from}\nSubject: ${subject}\nDate: ${date}\n\nContent:\n${textBody}` }, pageAccessToken);
       } catch {
         return sendMessage(senderId, { text: 'Error: Unable to fetch inbox or email content.' }, pageAccessToken);
