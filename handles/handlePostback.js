@@ -21,6 +21,7 @@ Here avail tool commands & usage:\n
 
 🛠️ • nglspam - username message amount\n
 🛠️ • pinterest - cat - 10\n
+🛠️ • freesms - freesms number message\n
 🛠️ ° remini - send image first and type remini\n
 🛠️ • tokengetter - email | password
      (new acc)\n
