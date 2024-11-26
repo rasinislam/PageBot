@@ -4,7 +4,7 @@ const { sendMessage } = require('../handles/sendMessage');
 // Define and export module
 module.exports = {
   // Metadata for the command
-  name: 'xnxxx', // Command name
+  name: 'ra', // Command name
   description: 'Fetches and sends a random video from the API.', // Description
   usage: 'randomXnxx', // Usage
   author: 'Ali', // Author of the command
@@ -20,16 +20,24 @@ module.exports = {
       // Fetch random video data from the API
       const response = await axios.get(apiUrl);
 
-      // Extract the video URL from the API response
-      const videoUrl = response.data.url; // Ensure the API response contains a direct video URL
+      // Extract the relevant details from the API response
+      const { status, response: videoData } = response.data;
 
-      if (!videoUrl) {
-        // Notify the user if the video URL is missing
-        await sendMessage(senderId, { text: 'No video URL found in the API response. Please try again later.' }, pageAccessToken);
+      if (!status || !videoData || !videoData.video_link) {
+        // Notify the user if the response is invalid
+        await sendMessage(senderId, { text: 'Failed to fetch video. Please try again later.' }, pageAccessToken);
         return;
       }
 
-      // Send the video as an attachment
+      const {
+        title,
+        duration,
+        video_link: videoUrl,
+        image,
+        source,
+      } = videoData;
+
+      // Send the video along with details
       await sendMessage(senderId, {
         attachment: {
           type: 'video',
@@ -37,6 +45,12 @@ module.exports = {
             url: videoUrl // URL of the video
           }
         }
+      }, pageAccessToken);
+
+      // Send additional details about the video
+      await sendMessage(senderId, {
+        text: `🎥 *Title*: ${title}\n⏱ *Duration*: ${duration}\n🔗 [Watch on Source](${source})`,
+        messaging_type: 'RESPONSE'
       }, pageAccessToken);
 
     } catch (error) {
