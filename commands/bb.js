@@ -28,7 +28,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   const apiUrl = "https://api.kenliejugarap.com/blackbox-gpt4o/?";
 
   try {
-    const { data } = await axios.get(apiUrl, { params: { text: question} });
+    const { data } = await axios.get(apiUrl, { params: { question: question} });
     let response = data.response;
 
     sendMessage(senderId, { text: 'Answering your question...' }, pageAccessToken);
