@@ -6,18 +6,18 @@ const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
   name: 'blackbox',
-  description: 'Interact Free GPT - OpenAI.',
-  author: 'Arn',// api by kenlie
+  description: 'Interact with Blackbox GPT-4 OpenAI.',
+  author: 'Arn', // API by Kenlie
 
   async execute(senderId, args) {
     const pageAccessToken = token;
     const query = args.join(" ").toLowerCase();
     if (!query) {
-      return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
+      return await sendMessage(senderId, { text: "How can I assist you today?" }, pageAccessToken);
     }
 
     if (query === "hello" || query === "hi") {
-      return await sendMessage(senderId, { text: "Hello! How can I help you?" }, pageAccessToken);
+      return await sendMessage(senderId, { text: "Hello! How can I assist you?" }, pageAccessToken);
     }
 
     await handleChatResponse(senderId, query, pageAccessToken);
@@ -25,21 +25,20 @@ module.exports = {
 };
 
 const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const apiUrl = "https://api.kenliejugarap.com/blackbox-gpt4o/?";
+  const apiUrl = "https://api.kenliejugarap.com/blackbox-gpt4o/";
 
   try {
-    const { data } = await axios.get(apiUrl, { params: { question: question} });
+    const { data } = await axios.get(apiUrl, { params: { text: input } });
     let response = data.response;
 
     sendMessage(senderId, { text: 'Answering your question...' }, pageAccessToken);
 
-    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
     const formattedResponse = `${response}`;
 
     await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
-    await sendError(senderId, '❌ Ahh sh1t error again.', pageAccessToken);
+    await sendError(senderId, '❌ There was an error processing your request.', pageAccessToken);
   }
 };
 
@@ -66,7 +65,6 @@ const splitMessageIntoChunks = (message, chunkSize) => {
 };
 
 const sendError = async (senderId, errorMessage, pageAccessToken) => {
-  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
   const formattedMessage = `${errorMessage}`;
 
   await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
