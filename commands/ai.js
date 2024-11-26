@@ -11,7 +11,6 @@ module.exports = {
 
   async execute(senderId, args) {
     const pageAccessToken = token;
-
     const query = args.join(" ").toLowerCase();
     if (!query) {
       return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
@@ -31,8 +30,6 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   try {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
-
-    sendMessage(senderId, { text: `Answering your question please wait..` }, pageAccessToken);
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
     const formattedResponse = `${response}`;
