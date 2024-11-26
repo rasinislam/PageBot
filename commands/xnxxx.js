@@ -1,66 +1,51 @@
 const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
+const fs = require('fs');
 
-// Define and export module
+const token = fs.readFileSync('token.txt', 'utf8');
+
 module.exports = {
-  // Metadata for the command
-  name: 'ra', // Command name
-  description: 'Fetches and sends a random video from the API.', // Description
-  usage: 'randomXnxx', // Usage
-  author: 'Ali', // Author of the command
+  name: 'randomXnxx',
+  description: 'Fetch and send a random video.',
+  usage: 'ra',
+  author: 'Ali',
 
-  // Main function that executes the command
-  async execute(senderId, args, pageAccessToken) {
-    // Notify user that the video is being fetched
-    await sendMessage(senderId, { text: 'Fetching a random video... Please wait.' }, pageAccessToken);
-
-    const apiUrl = 'https://api.kenliejugarap.com/xnxx-random/'; // API endpoint
+  execute: async (senderId) => {
+    const pageAccessToken = token;
+    const apiUrl = 'https://api.kenliejugarap.com/xnxx-random/';
 
     try {
-      // Fetch random video data from the API
-      const response = await axios.get(apiUrl);
+      const { data } = await axios.get(apiUrl);
 
-      // Extract the relevant details from the API response
-      const { status, response: videoData } = response.data;
+      if (data.status && data.response && data.response.video_link) {
+        const { title, duration, video_link: videoUrl, source } = data.response;
 
-      if (!status || !videoData || !videoData.video_link) {
-        // Notify the user if the response is invalid
-        await sendMessage(senderId, { text: 'Failed to fetch video. Please try again later.' }, pageAccessToken);
-        return;
-      }
-
-      const {
-        title,
-        duration,
-        video_link: videoUrl,
-        image,
-        source,
-      } = videoData;
-
-      // Send the video along with details
-      await sendMessage(senderId, {
-        attachment: {
-          type: 'video',
-          payload: {
-            url: videoUrl // URL of the video
+        // Send video
+        const videoMessage = {
+          attachment: {
+            type: 'video',
+            payload: { url: videoUrl }
           }
-        }
-      }, pageAccessToken);
+        };
 
-      // Send additional details about the video
-      await sendMessage(senderId, {
-        text: `🎥 *Title*: ${title}\n⏱ *Duration*: ${duration}\n🔗 [Watch on Source](${source})`,
-        messaging_type: 'RESPONSE'
-      }, pageAccessToken);
+        await sendMessage(senderId, videoMessage, pageAccessToken);
 
+        // Send additional video details
+        const detailsMessage = {
+          text: `🎥 *Title*: ${title}\n⏱ *Duration*: ${duration}\n🔗 [Watch on Source](${source})`
+        };
+
+        await sendMessage(senderId, detailsMessage, pageAccessToken);
+      } else {
+        sendError(senderId, 'Error: Unable to fetch video.', pageAccessToken);
+      }
     } catch (error) {
-      // Handle and log any errors
-      console.error('Error fetching or sending video:', error);
-
-      // Notify user of the error
-      await sendMessage(senderId, {
-        text: 'Sorry, an error occurred while fetching the video. Please try again later.'
-      }, pageAccessToken);
+      console.error('Error fetching video:', error);
+      sendError(senderId, 'Error: Unexpected error occurred.', pageAccessToken);
     }
-  }
+  },
+};
+
+const sendError = async (senderId, errorMessage, pageAccessToken) => {
+  await sendMessage(senderId, { text: errorMessage }, pageAccessToken);
 };
