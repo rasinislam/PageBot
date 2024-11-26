@@ -5,7 +5,7 @@ const fs = require('fs');
 const token = fs.readFileSync('token.txt', 'utf8');
 
 module.exports = {
-  name: 'test',
+  name: 'ai',
   description: 'Interact Free GPT - OpenAI.',
   author: 'Arn',// api by kenlie
 
@@ -30,6 +30,8 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   try {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
+
+    sendMessage(senderId, { text: 'Answering...' }, pageAccessToken);
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
     const formattedResponse = `${response}`;
