@@ -17,6 +17,8 @@ module.exports = {
       return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
     }
 
+    sendMessage(senderId, { text: "Answering your question please wait.." }, pageAccessToken);
+
     if (query === "hello" || query === "hi") {
       return await sendMessage(senderId, { text: "Hello! How can I help you?" }, pageAccessToken);
     }
