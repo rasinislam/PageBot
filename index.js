@@ -103,6 +103,26 @@ fs.watch(COMMANDS_PATH, (eventType, filename) => {
   }
 });
 
+async function post() {
+  console.log("Auto 1 Hour Post Enabled");
+  const autoPost = cron.schedule(`0 */1 * * *`, async () => {
+    const {
+      content,
+      author
+    } = (await axios.get(`https://api.realinspire.tech/v1/quotes/random`)).data[0];
+    await api.publishPost(`💭 Remember...
+${content}
+-${author}
+`, PAGE_ACCESS_TOKEN);
+    console.log("Triggered autopost.");
+  }, {
+    scheduled: true,
+    timezone: "Asia/Manila"
+  });
+  autoPost.start();
+}
+
+
 // Server initialization
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
