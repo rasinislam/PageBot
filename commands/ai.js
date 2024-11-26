@@ -32,7 +32,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
 
-sendMessage(senderId, { text: "Answering your question please wait.." }, pageAccessToken);
+sendMessage(senderId, { text: 'Answering your question please wait..' }, pageAccessToken);
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
     const formattedResponse = `${response}`;
