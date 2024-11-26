@@ -26,10 +26,10 @@ module.exports = {
 };
 
 const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const apiUrl = "https://api.kenliejugarap.com/blackbox";
+  const apiUrl = "https://mekumi-rest-api.onrender.com/api/chatgpt?";
 
   try {
-    const { data } = await axios.get(apiUrl, { params: { text: input } });
+    const { data } = await axios.get(apiUrl, { params: { message: input } });
     let response = data.response;
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
