@@ -23,10 +23,7 @@ module.exports = {
     }
 
     if (query === "sino creator mo?" || query === "who created you?") {
-      const jokeMessage = "
-━━━━━━━━━━━━━━━━
-Arn/Rynx Gaiser
-━━━━━━━━━━━━━━━━ ";
+      const jokeMessage = "Arn/Rynx Gaiser";
       const formattedMessage = useFontFormatting ? formatResponse(jokeMessage) : jokeMessage;
       return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
