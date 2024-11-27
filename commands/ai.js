@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 const fs = require('fs');
+
 const token = fs.readFileSync('token.txt', 'utf8');
 
 // Toggle font formatting: true = use fonts, false = normal text
@@ -14,17 +15,12 @@ module.exports = {
   async execute(senderId, args) {
     const pageAccessToken = token;
     const query = args.join(" ").toLowerCase();
-
     if (!query) {
-      const defaultMessage = "How can I help you?";
-      const formattedMessage = useFontFormatting ? formatresponse(defaultMessage) : defaultMessage;
-      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
+      return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
     }
 
     if (query === "jsnekwksnekanswjkw" || query === "jsjwjegeiwjsjkwjsjs") {
-      const jokeMessage = "Baliw HAHAAH";
-      const formattedMessage = useFontFormatting ? formatresponse(jokeMessage) : jokeMessage;
-      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
+      return await sendMessage(senderId, { text: "Baliw HAHAAH" }, pageAccessToken);
     }
 
     await handleChatResponse(senderId, query, pageAccessToken);
@@ -39,18 +35,17 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     let response = data.response;
 
     sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
-     const formattedResponse = `GPT\n${formatResponse(response)}`;
 
-    
-  }
-};
+    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+
+    // Conditionally format the response based on the toggle
+    const formattedResponse = `${formatResponse(response)}`;
+
+
     await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
-
-    const errorMessage = '❌ Ahh sh1t error again.';
-    const formattedMessage = useFontFormatting ? formatresponse(errorMessage) : errorMessage;
-    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
+    await sendError(senderId, '❌ Ahh sh1t error again.', pageAccessToken);
   }
 };
 
@@ -74,6 +69,13 @@ const splitMessageIntoChunks = (message, chunkSize) => {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
+};
+
+const sendError = async (senderId, errorMessage, pageAccessToken) => {
+  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+  const formattedMessage = `${errorMessage}`;
+
+  await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
 };
 
 // Function for formatting the response
