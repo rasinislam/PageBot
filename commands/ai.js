@@ -44,7 +44,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     // Using template string to include the response dynamically
     const defaultMessage = `Free GPT / OpenAI
 ━━━━━━━━━━━━━━━━
-❓ Question: ${input}
+❓Question: ${input}
 ━━━━━━━━━━━━━━━━ 
 ✅ Answer: ${response}
 ━━━━━━━━━━━━━━━━`;
