@@ -55,10 +55,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
 
-    const errorMessage = 'Free GPT / OpenAI
- ━━━━━━━━━━━━━━━━
-❌ Ahh sh1t error again.
- ━━━━━━━━━━━━━━━━ ';
+    const errorMessage = 'Ahh sh1t error again.';
     const formattedMessage = useFontFormatting ? formatResponse(errorMessage) : errorMessage;
     await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
