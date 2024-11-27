@@ -4,7 +4,7 @@ const fs = require('fs');
 const token = fs.readFileSync('token.txt', 'utf8');
 
 // [ true if turn on font & false if turn off ]
-const useFontFormatting = false;
+const useFontFormatting = true;
 
 module.exports = {
   name: 'ai',
@@ -38,10 +38,8 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
 
-    // Get the current response time in the Manila timezone
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
-    // Answering message with font formatting if enabled
     const answeringMessage = `🕗 Answering your question...`;
     const formattedAnsweringMessage = useFontFormatting ? formatResponse(answeringMessage) : answeringMessage;
     await sendMessage(senderId, { text: formattedAnsweringMessage }, pageAccessToken);
@@ -52,7 +50,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
 ━━━━━━━━━━━━━━━━ 
 ✅ Answer: ${response}
 ━━━━━━━━━━━━━━━━ 
-⏰ Response Time: ${responseTime}`;
+⏰ Response: ${responseTime}`;
 
     const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
 
@@ -101,3 +99,4 @@ function formatResponse(responseText) {
 
   return responseText.split('').map(char => fontMap[char] || char).join('');
 }
+// WhyWouldiCare
