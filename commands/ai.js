@@ -39,9 +39,11 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     let response = data.response;
 
     sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
-
-    const formattedResponse = useFontFormatting ? formatresponse(response) : response;
-
+     const formattedResponse = `gpt\n${response}`
+    const formattedMessage = useFontFormatting ? formatresponse(responseMessage) : responseMessage;
+    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
+  }
+};
     await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
