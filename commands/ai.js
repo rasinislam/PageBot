@@ -8,7 +8,7 @@ const token = fs.readFileSync('token.txt', 'utf8');
 const useFontFormatting = true;
 
 // Choose font by number: 0 = Main font, 1 = Comic, 2 = Cursive
-const selectedFont = 1;
+const selectedFont = 2;
 
 module.exports = {
   name: 'ai',
