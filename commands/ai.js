@@ -38,16 +38,22 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
 
-    // Notify the user that the response is being processed
-    await sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
+    // Get the current response time in the Manila timezone
+    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
-    // Using template string to include the response dynamically
+    // Answering message with font formatting if enabled
+    const answeringMessage = `🕗  Answering your question... (Time: ${responseTime})`;
+    const formattedAnsweringMessage = useFontFormatting ? formatResponse(answeringMessage) : answeringMessage;
+    await sendMessage(senderId, { text: formattedAnsweringMessage }, pageAccessToken);
+
     const defaultMessage = `Free GPT / OpenAI
 ━━━━━━━━━━━━━━━━
 ❓Question: ${input}
 ━━━━━━━━━━━━━━━━ 
 ✅ Answer: ${response}
-━━━━━━━━━━━━━━━━`;
+━━━━━━━━━━━━━━━━ 
+⏰ Response Time: ${responseTime}`;
+
     const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
 
     await sendConcatenatedMessage(senderId, formattedMessage, pageAccessToken);
