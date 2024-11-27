@@ -3,20 +3,20 @@ const { sendMessage } = require('../handles/sendMessage');
 const fs = require('fs');
 const token = fs.readFileSync('token.txt', 'utf8');
 
-// [ true if turn on font & false if turn off 
+// [ true if turn on font & false if turn off ]
 const useFontFormatting = false;
 
 module.exports = {
   name: 'ai',
   description: 'Interact Free GPT - OpenAI.',
-  author: 'Arn', // api by kenlie
+  author: 'Arn', // API by Kenlie Navacilla Jugarap
 
   async execute(senderId, args) {
     const pageAccessToken = token;
     const query = args.join(" ").toLowerCase();
 
     if (!query) {
-      const defaultMessage = "Hello, how can i help you?";
+      const defaultMessage = "🌟 Hello, how can i help you?";
       const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
       return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
@@ -82,7 +82,6 @@ const splitMessageIntoChunks = (message, chunkSize) => {
   return chunks;
 };
 
-// Function for formatting the response
 function formatResponse(responseText) {
   const fontMap = {
     ' ': ' ',
