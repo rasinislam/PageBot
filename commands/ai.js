@@ -1,11 +1,10 @@
 const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 const fs = require('fs');
-
 const token = fs.readFileSync('token.txt', 'utf8');
 
-// Toggle font formatting: true = use fonts, false = normal text
-const useFontFormatting = true;
+// [ true if turn on font & false if turn off 
+const useFontFormatting = false;
 
 module.exports = {
   name: 'ai',
@@ -17,7 +16,7 @@ module.exports = {
     const query = args.join(" ").toLowerCase();
 
     if (!query) {
-      const defaultMessage = "Hello how can i help you?";
+      const defaultMessage = "Hello, how can i help you?";
       const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
       return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
@@ -45,9 +44,9 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     // Using template string to include the response dynamically
     const defaultMessage = `Free GPT / OpenAI
 ━━━━━━━━━━━━━━━━
-𝗤𝘂𝗲𝘀𝘁𝗶𝗼𝗻:${input}
+𝗤𝘂𝗲𝘀𝘁𝗶𝗼𝗻: ${input}
 ━━━━━━━━━━━━━━━━ 
-𝗔𝗻𝘀𝘄𝗲𝗿:${response}
+𝗔𝗻𝘀𝘄𝗲𝗿: ${response}
 ━━━━━━━━━━━━━━━━`;
     const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
 
@@ -55,7 +54,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
 
-    const errorMessage = 'Ahh sh1t error again.';
+    const errorMessage = '❌ Ahh sh1t error again.';
     const formattedMessage = useFontFormatting ? formatResponse(errorMessage) : errorMessage;
     await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
