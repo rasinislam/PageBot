@@ -15,12 +15,17 @@ module.exports = {
   async execute(senderId, args) {
     const pageAccessToken = token;
     const query = args.join(" ").toLowerCase();
+
     if (!query) {
-      return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
+      const defaultMessage = "How can I help you?";
+      const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
+      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
 
     if (query === "jsnekwksnekanswjkw" || query === "jsjwjegeiwjsjkwjsjs") {
-      return await sendMessage(senderId, { text: "Baliw HAHAAH" }, pageAccessToken);
+      const jokeMessage = "Baliw HAHAAH";
+      const formattedMessage = useFontFormatting ? formatResponse(jokeMessage) : jokeMessage;
+      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
 
     await handleChatResponse(senderId, query, pageAccessToken);
@@ -34,18 +39,20 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
 
-    sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
+    // Notify the user that the response is being processed
+    await sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
 
-    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+    // Using template string to include the response dynamically
+    const defaultMessage = `GPT\n${response}`;
+    const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
 
-    // Conditionally format the response based on the toggle
-    const formattedResponse = `${formatResponse(response)}`;
-
-
-    await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
+    await sendConcatenatedMessage(senderId, formattedMessage, pageAccessToken);
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
-    await sendError(senderId, '❌ Ahh sh1t error again.', pageAccessToken);
+
+    const errorMessage = '❌ Ahh sh1t error again.';
+    const formattedMessage = useFontFormatting ? formatResponse(errorMessage) : errorMessage;
+    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
 };
 
@@ -71,16 +78,9 @@ const splitMessageIntoChunks = (message, chunkSize) => {
   return chunks;
 };
 
-const sendError = async (senderId, errorMessage, pageAccessToken) => {
-  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-  const formattedMessage = `${errorMessage}`;
-
-  await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
-};
-
 // Function for formatting the response
-function formatresponse(responsetext) {
-  const fontmap = {
+function formatResponse(responseText) {
+  const fontMap = {
     ' ': ' ',
     'a': '𝗮', 'b': '𝗯', 'c': '𝗰', 'd': '𝗱', 'e': '𝗲', 'f': '𝗳', 'g': '𝗴', 'h': '𝗵',
     'i': '𝗶', 'j': '𝗷', 'k': '𝗸', 'l': '𝗹', 'm': '𝗺', 'n': '𝗻', 'o': '𝗼', 'p': '𝗽', 'q': '𝗾',
@@ -90,5 +90,5 @@ function formatresponse(responsetext) {
     'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨', 'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭',
   };
 
-  return responsetext.split('').map(char => fontmap[char] || char).join('');
+  return responseText.split('').map(char => fontMap[char] || char).join('');
 }
