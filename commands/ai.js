@@ -17,10 +17,7 @@ module.exports = {
     const query = args.join(" ").toLowerCase();
 
     if (!query) {
-      const defaultMessage = "Free GPT / OpenAI
- ━━━━━━━━━━━━━━━━
-How can I help you?
- ━━━━━━━━━━━━━━━━ ";
+      const defaultMessage = "Hello how can i help you?";
       const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
       return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
