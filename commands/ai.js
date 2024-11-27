@@ -16,8 +16,8 @@ module.exports = {
       return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
     }
 
-    if (query === "hello" || query === "hi") {
-      return await sendMessage(senderId, { text: "Hello! How can I help you?" }, pageAccessToken);
+    if (query === "jsnekwksnekanswjkw" || query === "jsjwjegeiwjsjkwjsjs") {
+      return await sendMessage(senderId, { text: "Baliw HAHAAH" }, pageAccessToken);
     }
 
     await handleChatResponse(senderId, query, pageAccessToken);
@@ -31,7 +31,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const { data } = await axios.get(apiUrl, { params: { question: input } });
     let response = data.response;
 
-    sendMessage(senderId, { text: 'Answering your question...' }, pageAccessToken);
+    sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
     
