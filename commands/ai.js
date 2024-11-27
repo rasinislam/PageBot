@@ -39,9 +39,9 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     let response = data.response;
 
     sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
-     const formattedResponse = `gpt\n${response}`
-    const formattedMessage = useFontFormatting ? formatresponse(responseMessage) : responseMessage;
-    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
+     const formattedResponse = `GPT\n${formatResponse(response)}`;
+
+    
   }
 };
     await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
