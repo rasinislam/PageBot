@@ -5,7 +5,7 @@ const fs = require('fs');
 const token = fs.readFileSync('token.txt', 'utf8');
 
 // Toggle font formatting: true = use fonts, false = normal text
-const useFontFormatting = false;
+const useFontFormatting = true;
 
 module.exports = {
   name: 'ai',
