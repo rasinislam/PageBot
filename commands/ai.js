@@ -17,13 +17,17 @@ module.exports = {
     const query = args.join(" ").toLowerCase();
 
     if (!query) {
-      const defaultMessage = "How can I help you?";
+      const defaultMessage = "Free GPT / OpenAI
+ ━━━━━━━━━━━━━━━━
+How can I help you?
+ ━━━━━━━━━━━━━━━━ ";
       const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
       return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
 
-    if (query === "jsnekwksnekanswjkw" || query === "jsjwjegeiwjsjkwjsjs") {
-      const jokeMessage = "Baliw HAHAAH";
+    if (query === "sino creator mo?" || query === "who created you?") {
+      const jokeMessage = " ━━━━━━━━━━━━━━━━Arn/Rynx Gaiser
+ ━━━━━━━━━━━━━━━━ ";
       const formattedMessage = useFontFormatting ? formatResponse(jokeMessage) : jokeMessage;
       return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
@@ -43,14 +47,22 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     await sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
 
     // Using template string to include the response dynamically
-    const defaultMessage = `GPT\n${response}`;
+    const defaultMessage = `Free GPT / OpenAI
+━━━━━━━━━━━━━━━━
+𝗤𝘂𝗲𝘀𝘁𝗶𝗼𝗻:${input}
+━━━━━━━━━━━━━━━━ 
+𝗔𝗻𝘀𝘄𝗲𝗿:${response}
+━━━━━━━━━━━━━━━━`;
     const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
 
     await sendConcatenatedMessage(senderId, formattedMessage, pageAccessToken);
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
 
-    const errorMessage = '❌ Ahh sh1t error again.';
+    const errorMessage = 'Free GPT / OpenAI
+ ━━━━━━━━━━━━━━━━
+❌ Ahh sh1t error again.
+ ━━━━━━━━━━━━━━━━ ';
     const formattedMessage = useFontFormatting ? formatResponse(errorMessage) : errorMessage;
     await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
