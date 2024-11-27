@@ -4,7 +4,7 @@ const fs = require('fs');
 const token = fs.readFileSync('token.txt', 'utf8');
 
 // [ true if turn on font & false if turn off ]
-const useFontFormatting = true;
+const useFontFormatting = false;
 
 module.exports = {
   name: 'ai',
@@ -42,7 +42,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
     // Answering message with font formatting if enabled
-    const answeringMessage = `🕗  Answering your question... (Time: ${responseTime})`;
+    const answeringMessage = `🕗 Answering your question...`;
     const formattedAnsweringMessage = useFontFormatting ? formatResponse(answeringMessage) : answeringMessage;
     await sendMessage(senderId, { text: formattedAnsweringMessage }, pageAccessToken);
 
