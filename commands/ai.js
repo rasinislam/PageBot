@@ -15,12 +15,17 @@ module.exports = {
   async execute(senderId, args) {
     const pageAccessToken = token;
     const query = args.join(" ").toLowerCase();
+
     if (!query) {
-      return await sendMessage(senderId, { text: "How can I help you?" }, pageAccessToken);
+      const defaultMessage = "How can I help you?";
+      const formattedMessage = useFontFormatting ? formatresponse(defaultMessage) : defaultMessage;
+      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
 
     if (query === "jsnekwksnekanswjkw" || query === "jsjwjegeiwjsjkwjsjs") {
-      return await sendMessage(senderId, { text: "Baliw HAHAAH" }, pageAccessToken);
+      const jokeMessage = "Baliw HAHAAH";
+      const formattedMessage = useFontFormatting ? formatresponse(jokeMessage) : jokeMessage;
+      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
 
     await handleChatResponse(senderId, query, pageAccessToken);
@@ -36,15 +41,15 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
 
     sendMessage(senderId, { text: '🕗 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻...' }, pageAccessToken);
 
-    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-
-    // Conditionally format the response based on the toggle
     const formattedResponse = useFontFormatting ? formatresponse(response) : response;
 
     await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
-    await sendError(senderId, '❌ Ahh sh1t error again.', pageAccessToken);
+
+    const errorMessage = '❌ Ahh sh1t error again.';
+    const formattedMessage = useFontFormatting ? formatresponse(errorMessage) : errorMessage;
+    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
 };
 
@@ -68,13 +73,6 @@ const splitMessageIntoChunks = (message, chunkSize) => {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
-};
-
-const sendError = async (senderId, errorMessage, pageAccessToken) => {
-  const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-  const formattedMessage = `${errorMessage}`;
-
-  await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
 };
 
 // Function for formatting the response
