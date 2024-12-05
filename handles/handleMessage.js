@@ -117,6 +117,31 @@ if (messageText === 'upscale') {
   return;
 }
 
+if (messageText === 'faceswap') {
+  const baseImage = lastImageByUser.get(senderId); // Base image is the last image sent by the user
+  const swapImage = lastReplyImageByUser.get(senderId); // Swap image is the last image replied to by the user
+
+  if (baseImage && swapImage) {
+    try {
+      // Execute the faceswap command with the base and swap image URLs
+      await commands.get('faceswap').execute(senderId, [], pageAccessToken, baseImage, swapImage);
+      
+      // Remove images from memory after processing
+      lastImageByUser.delete(senderId);
+      lastReplyImageByUser.delete(senderId);
+    } catch (error) {
+      await sendMessage(senderId, { 
+        text: '❌ 𝗔𝗻 𝗲𝗿𝗿𝗼𝗿 𝗼𝗰𝗰𝘂𝗿𝗿𝗲𝗱 𝗱𝘂𝗿𝗶𝗻𝗴 𝘁𝗵𝗲 𝗳𝗮𝗰𝗲 𝘀𝘄𝗮𝗽. 𝗣𝗹𝗲𝗮𝘀𝗲 𝘁𝗿𝘆 𝗮𝗴𝗮𝗶𝗻.' 
+      }, pageAccessToken);
+    }
+  } else {
+    await sendMessage(senderId, { 
+      text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗯𝗼𝘁𝗵 𝗮 𝗯𝗮𝘀𝗲 𝗮𝗻𝗱 𝘀𝘄𝗮𝗽 𝗶𝗺𝗮𝗴𝗲. 𝗧𝘆𝗽𝗲 "𝗳𝗮𝗰𝗲𝘀𝘄𝗮𝗽" 𝗮𝗳𝘁𝗲𝗿 𝗿𝗲𝗽𝗹𝘆𝗶𝗻𝗴 𝘁𝗼 𝗮 𝗯𝗮𝘀𝗲 𝗶𝗺𝗮𝗴𝗲.' 
+    }, pageAccessToken);
+  }
+  return;
+}
+
 
     // Other command processing logic...
     let commandName, args;
