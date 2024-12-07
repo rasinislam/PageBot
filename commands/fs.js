@@ -2,44 +2,45 @@ const axios = require("axios");
 const { sendMessage } = require("../handles/sendMessage");
 
 module.exports = {
-  name: "fs",
-  description: "AI-powered face swap tool",
+  name: "faceswap",
+  description: "Swap faces between two images",
   author: "developer",
-  usage: "Send two pictures, reply to the base image with 'faceswap'",
+  usage: "Reply to two images with 'faceswap' to swap their faces",
 
-  async execute(senderId, args, pageAccessToken, baseImageUrl, swapImageUrl) {
-    // Check if both baseImageUrl and swapImageUrl are provided
-    if (!baseImageUrl || !swapImageUrl) {
+  async execute(senderId, args, pageAccessToken, images) {
+    // Check if exactly two image URLs are provided
+    if (!images || images.length !== 2) {
       return sendMessage(senderId, {
-        text: `❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗯𝗼𝘁𝗵 𝗯𝗮𝘀𝗲 𝗮𝗻𝗱 𝘀𝘄𝗮𝗽 𝗶𝗺𝗮𝗴𝗲𝘀, 𝗮𝗻𝗱 𝗿𝗲𝗽𝗹𝘆 "𝗳𝗮𝗰𝗲𝘀𝘄𝗮𝗽" 𝘁𝗼 𝘁𝗵𝗲 𝗯𝗮𝘀𝗲 𝗶𝗺𝗮𝗴𝗲.`
+        text: `❌ Please send exactly two images first, then reply with 'faceswap' to swap their faces.`
       }, pageAccessToken);
     }
 
-    // Notify the user that the face swap is in progress
-    sendMessage(senderId, { text: "⌛ 𝗙𝗮𝗰𝗲 𝘀𝘄𝗮𝗽 𝗶𝗻 𝗽𝗿𝗼𝗴𝗿𝗲𝘀𝘀, 𝗽𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁...." }, pageAccessToken);
+    const [targetImageUrl, sourceImageUrl] = images;
+
+    // Notify the user that processing is in progress
+    sendMessage(senderId, { text: "⌛ Swapping faces, please wait...." }, pageAccessToken);
 
     try {
-      // Fetch the swapped image from the API
+      // Call the face swap API
       const response = await axios.get(
-        `https://kaiz-apis.gleeze.com/api/faceswap?baseUrl=${encodeURIComponent(baseImageUrl)}&swapUrl=${encodeURIComponent(swapImageUrl)}`
+        `https://api.kenliejugarap.com/faceswap/?target=${encodeURIComponent(targetImageUrl)}&source=${encodeURIComponent(sourceImageUrl)}`
       );
-      
-      const swappedImageURL = response.data.response;
+      const processedImageURL = response.data.response;
 
-      // Send the swapped image URL back to the user
+      // Send the processed image back to the user
       await sendMessage(senderId, {
         attachment: {
           type: "image",
           payload: {
-            url: swappedImageURL
+            url: processedImageURL
           }
         }
       }, pageAccessToken);
 
     } catch (error) {
-      console.error("❌ Error during face swap:", error);
+      console.error("❌ Error processing image:", error);
       await sendMessage(senderId, {
-        text: `❌ An error occurred during the face swap. Please try again later.`
+        text: `❌ An error occurred while processing the images. Please try again later.`
       }, pageAccessToken);
     }
   }
