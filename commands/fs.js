@@ -2,7 +2,7 @@ const axios = require("axios");
 const { sendMessage } = require("../handles/sendMessage");
 
 module.exports = {
-  name: "faceswap",
+  name: "fs",
   description: "Swap faces between two images",
   author: "developer",
   usage: "Reply to two images with 'faceswap' to swap their faces",
