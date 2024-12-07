@@ -97,7 +97,7 @@ if (messageText === 'imgur') {
           await sendMessage(senderId, { text: '🫵😼' }, pageAccessToken);
         }
       } else {
-        await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝗼𝗿 𝘃𝗶𝗱𝗲𝗼 𝗳𝗶𝗿𝘀𝘁, 𝘁𝗵𝗲𝗻 𝘁𝘆𝗽𝗲 "𝗶𝗺𝗴𝘂𝗿" 𝘁𝗼 𝘂𝗽𝗹𝗼𝗮𝗱 𝗰𝗼𝗻𝘃𝗲𝗿𝘁 𝗹𝗶𝗻𝗸' }, pageAccessToken);
+        await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 l pageAccessToken);
       }
       return;
     }
@@ -117,28 +117,25 @@ if (messageText === 'upscale') {
   return;
 }
 
-if (messageText === 'faceswap') {
-  const baseImage = lastImageByUser.get(senderId); // Base image is the last image sent by the user
-  const swapImage = lastReplyImageByUser.get(senderId); // Swap image is the last image replied to by the user
+// Handling "faceswap" command
+if (messageText === 'fs') {
+  const images = lastImagesByUser.get(senderId);
 
-  if (baseImage && swapImage) {
+  if (images && images.length === 2) {
     try {
-      // Execute the faceswap command with the base and swap image URLs
-      await commands.get('faceswap').execute(senderId, [], pageAccessToken, baseImage, swapImage);
-      
-      // Remove images from memory after processing
-      lastImageByUser.delete(senderId);
-      lastReplyImageByUser.delete(senderId);
+      await commands.get('fs').execute(senderId, [], pageAccessToken, images);
+      lastImagesByUser.delete(senderId); // Remove the images from memory after processing
     } catch (error) {
       await sendMessage(senderId, { 
-        text: '❌ 𝗔𝗻 𝗲𝗿𝗿𝗼𝗿 𝗼𝗰𝗰𝘂𝗿𝗿𝗲𝗱 𝗱𝘂𝗿𝗶𝗻𝗴 𝘁𝗵𝗲 𝗳𝗮𝗰𝗲 𝘀𝘄𝗮𝗽. 𝗣𝗹𝗲𝗮𝘀𝗲 𝘁𝗿𝘆 𝗮𝗴𝗮𝗶𝗻.' 
+        text: '❌ An error occurred while processing the face swap.' 
       }, pageAccessToken);
     }
   } else {
     await sendMessage(senderId, { 
-      text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 𝗯𝗼𝘁𝗵 𝗮 𝗯𝗮𝘀𝗲 𝗮𝗻𝗱 𝘀𝘄𝗮𝗽 𝗶𝗺𝗮𝗴𝗲. 𝗧𝘆𝗽𝗲 "𝗳𝗮𝗰𝗲𝘀𝘄𝗮𝗽" 𝗮𝗳𝘁𝗲𝗿 𝗿𝗲𝗽𝗹𝘆𝗶𝗻𝗴 𝘁𝗼 𝗮 𝗯𝗮𝘀𝗲 𝗶𝗺𝗮𝗴𝗲.' 
+      text: '❌ Please send exactly two images first, then reply with "faceswap" to swap their faces.' 
     }, pageAccessToken);
   }
+
   return;
 }
 
