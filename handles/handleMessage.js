@@ -118,12 +118,12 @@ if (messageText === 'upscale') {
 }
 
 // Handling "faceswap" command
-if (messageText === 'fs') {
+if (messageText === 'faceswap') {
   const images = lastImagesByUser.get(senderId);
 
   if (images && images.length === 2) {
     try {
-      await commands.get('fs').execute(senderId, [], pageAccessToken, images);
+      await commands.get('faceswap').execute(senderId, [], pageAccessToken, images);
       lastImagesByUser.delete(senderId); // Remove the images from memory after processing
     } catch (error) {
       await sendMessage(senderId, { 
