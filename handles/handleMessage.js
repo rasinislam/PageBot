@@ -83,24 +83,6 @@ if (messageText.startsWith('ai')) {
 }
 
 
-if (messageText === 'imgur') {
-      const lastImage = lastImageByUser.get(senderId);
-      const lastVideo = lastVideoByUser.get(senderId);
-      const mediaToUpload = lastImage || lastVideo;
-
-      if (mediaToUpload) {
-        try {
-          await commands.get('imgur').execute(senderId, [], pageAccessToken, mediaToUpload);
-          lastImageByUser.delete(senderId);
-          lastVideoByUser.delete(senderId);
-        } catch (error) {
-          await sendMessage(senderId, { text: '🫵😼' }, pageAccessToken);
-        }
-      } else {
-        await sendMessage(senderId, { text: '❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗻𝗱 l pageAccessToken);
-      }
-      return;
-    }
 // Handling "upscale" command
 if (messageText === 'upscale') {
   const lastImage = lastImageByUser.get(senderId);
