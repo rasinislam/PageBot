@@ -70,18 +70,28 @@ if (messageText === 'remini') {
 }
 
 
-    // Handling "ai" command
+      // Handling "ai3" command
 if (messageText.startsWith('ai')) {
-  const args = messageText.split(/\s+/).slice(1);
+  const lastImage = lastImageByUser.get(senderId); // Retrieve the last image sent by the user
+  const args = messageText.split(/\s+/).slice(1); // Extract arguments from the command
 
   try {
-    await commands.get('ai').execute(senderId, args);
+    // Execute the "ai" command
+    await commands.get('ai').execute(senderId, args, pageAccessToken, event, lastImage);
+
+    // Clear the stored image after processing
+    lastImageByUser.delete(senderId);
   } catch (error) {
-    await sendMessage(senderId, { text: 'An error occurred while processing the AI command.' }, pageAccessToken);
+    console.error('Error while processing the AI3 command:', error);
+    // Send error feedback to the user
+    await sendMessage(
+      senderId, 
+      { text: '❌ An error occurred while processing your AI3 request. Please try again later.' }, 
+      pageAccessToken
+    );
   }
   return;
 }
-
     // Handling "gem" command
 if (messageText.startsWith('gem')) {
   const lastImage = lastImageByUser.get(senderId); // Retrieve the last image sent by the user
