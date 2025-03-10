@@ -12,7 +12,7 @@ module.exports = {
     if (!userMessage) {
       return sendMessage(
         senderId,
-        { text: "❌ Please provide a question for Gemini AI." },
+        { text: " Please provide a question for Cici Ai." },
         pageAccessToken
       );
     }
