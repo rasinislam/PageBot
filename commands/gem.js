@@ -3,7 +3,7 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: "cici",
-  description: "interact to gemini 1.5 flash vision",
+  description: "cici command",
   author: "developer",
 
   async execute(senderId, args, pageAccessToken, event, imageUrl) {
