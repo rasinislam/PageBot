@@ -6,7 +6,7 @@ const token = fs.readFileSync("token.txt", "utf8");
 
 module.exports = {
   name: "ai",
-  description: "Interact with GPT-4 via CCProject API",
+  description: "cici command ",
   author: "developer",
 
   async execute(senderId, args) {
