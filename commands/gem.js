@@ -31,7 +31,7 @@ module.exports = {
         const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
         const response = await handleImageRecognition(apiUrl, finalPrompt, imageUrl, senderId);
         const result = response.response;
-        const visionResponse = `🌌 𝐆𝐞𝐦𝐢𝐧𝐢 𝐀𝐧𝐚𝐥𝐲𝐬𝐢𝐬\n━━━━━━━━━━━━━━━━━━\n${result}`;
+        const visionResponse = `${result}`;
         await sendConcatenatedMessage(senderId, visionResponse, pageAccessToken);
       } else {
         const apiUrl = `https://rest-api-french4.onrender.com/api/clarencev2`;
