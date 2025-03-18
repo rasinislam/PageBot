@@ -3,32 +3,47 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: "cici",
-  description: "cici command",
+  description: "cici command ",
   author: "developer",
 
   async execute(senderId, args, pageAccessToken, event, imageUrl) {
-    const userPrompt = args.join(" ");
+    const userPrompt = args.join(" ").trim();
 
     if (!userPrompt && !imageUrl) {
-      return sendMessage(senderId, { 
-        text: `Hello 😊 yes I am, kindly provide your question or an image for analysis.` 
-      }, pageAccessToken);
+      return sendMessage(
+        senderId,
+        {
+          text: `❌ 𝗣𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻 𝗼𝗿 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝗮𝗹𝗼𝗻𝗴 𝘄𝗶𝘁𝗵 𝗮 𝗱𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻 𝗳𝗼𝗿 𝗿𝗲𝗰𝗼𝗴𝗻𝗶𝘁𝗶𝗼𝗻.`
+        },
+        pageAccessToken
+      );
     }
+
+    sendMessage(
+      senderId,
+      {
+        text: "⌛ 𝗔𝗻𝘀𝘄𝗲𝗿𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻, 𝗽𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁..."
+      },
+      pageAccessToken
+    );
 
     try {
       if (!imageUrl) {
-        if (event.message.reply_to && event.message.reply_to.mid) {
+        if (event.message?.reply_to?.mid) {
           imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
-        } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
+        } else if (event.message?.attachments?.[0]?.type === "image") {
           imageUrl = event.message.attachments[0].payload.url;
         }
       }
 
-      const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
-      const response = await handleImageRecognition(apiUrl, userPrompt, imageUrl);
-      const result = response.response;
+      const apiUrl = "https://jerome-web.onrender.com/service/api/gemini";
+      const response = await handleGeminiRequest(apiUrl, userPrompt, imageUrl);
+      const result = response.vision || response.textResponse;
 
-      const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+      const responseTime = new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Manila",
+        hour12: true
+      });
 
       const message = `${result}`;
 
@@ -36,16 +51,20 @@ module.exports = {
 
     } catch (error) {
       console.error("Error in Gemini command:", error);
-      sendMessage(senderId, { text: `Error: ${error.message || "Something went wrong."}` }, pageAccessToken);
+      sendMessage(
+        senderId,
+        { text: `❌ Error: ${error.message || "Something went wrong."}` },
+        pageAccessToken
+      );
     }
   }
 };
 
-async function handleImageRecognition(apiUrl, prompt, imageUrl) {
+async function handleGeminiRequest(apiUrl, prompt, imageUrl) {
   const { data } = await axios.get(apiUrl, {
     params: {
-      q: prompt,
-      imageUrl: imageUrl || ""
+      ask: prompt,
+      imgurl: imageUrl || ""
     }
   });
 
@@ -57,11 +76,11 @@ async function getRepliedImage(mid, pageAccessToken) {
     params: { access_token: pageAccessToken }
   });
 
-  if (data && data.data.length > 0 && data.data[0].image_data) {
+  if (data?.data?.[0]?.image_data?.url) {
     return data.data[0].image_data.url;
-  } else {
-    return "";
   }
+
+  return "";
 }
 
 async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
