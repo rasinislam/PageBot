@@ -13,7 +13,7 @@ module.exports = {
 
     if (!finalPrompt) {
       return sendMessage(senderId, { 
-        text: "Yes. i am 😊 kindly provide your specific questions." 
+        text: "Yes. I am 😊 Kindly provide your specific questions." 
       }, pageAccessToken);
     }
 
@@ -27,24 +27,12 @@ module.exports = {
         }
       }
 
-      if (imageUrl) {
-        const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
-        const response = await handleImageRecognition(apiUrl, finalPrompt, imageUrl, senderId);
-        const result = response.response;
-        const visionResponse = `${result}`;
-        await sendConcatenatedMessage(senderId, visionResponse, pageAccessToken);
-      } else {
-        const apiUrl = `https://rest-api-french4.onrender.com/api/clarencev2`;
-        const response = await axios.get(apiUrl, {
-          params: {
-            prompt: finalPrompt,
-            uid: senderId
-          }
-        });
-        const gptMessage = response.data.response;
-        const gptResponse = `${gptMessage}`;
-        await sendConcatenatedMessage(senderId, gptResponse, pageAccessToken);
-      }
+      const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
+      const response = await handleImageRecognition(apiUrl, finalPrompt, imageUrl, senderId);
+      const result = response.response;
+      const visionResponse = `${result}`;
+      await sendConcatenatedMessage(senderId, visionResponse, pageAccessToken);
+      
     } catch (error) {
       console.error("Error in AI command:", error);
       sendMessage(senderId, { text: `Error: ${error.message || "Something went wrong."}` }, pageAccessToken);
