@@ -13,7 +13,7 @@ module.exports = {
 
     if (!finalPrompt) {
       return sendMessage(senderId, { 
-        text: "Please enter your question or reply with an image to analyze." 
+        text: "Yes. i am 😊 kindly provide your specific questions." 
       }, pageAccessToken);
     }
 
