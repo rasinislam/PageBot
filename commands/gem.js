@@ -11,11 +11,10 @@ module.exports = {
 
     if (!userPrompt && !imageUrl) {
       return sendMessage(senderId, { 
-        text: `Hello 😊 yes i am, kindly provide your question ` 
+        text: `Hello 😊 yes I am, kindly provide your question or an image for analysis.` 
       }, pageAccessToken);
     }
 
-    
     try {
       if (!imageUrl) {
         if (event.message.reply_to && event.message.reply_to.mid) {
@@ -25,14 +24,12 @@ module.exports = {
         }
       }
 
-      const apiUrl = `https://api.zetsu.xyz/gemini`;
+      const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
       const response = await handleImageRecognition(apiUrl, userPrompt, imageUrl);
-      const result = response.gemini;
+      const result = response.response;
 
-      // Get the current response time in Manila timezone
       const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
-      // Format the response message
       const message = `${result}`;
 
       await sendConcatenatedMessage(senderId, message, pageAccessToken);
@@ -47,8 +44,8 @@ module.exports = {
 async function handleImageRecognition(apiUrl, prompt, imageUrl) {
   const { data } = await axios.get(apiUrl, {
     params: {
-      prompt,
-      url: imageUrl || ""
+      q: prompt,
+      imageUrl: imageUrl || ""
     }
   });
 
