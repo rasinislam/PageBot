@@ -83,4 +83,4 @@ const splitMessageIntoChunks = (message, chunkSize) => {
 
 const sendError = async (senderId, errorMessage, pageAccessToken) => {
   await sendMessage(senderId, { text: errorMessage }, pageAccessToken);
-};
+}; 
