@@ -16,15 +16,14 @@ const fontMapping = {
 };
 
 function convertToBold(text) {
-  return text.replace(/(?:\*\*(.*?)\*\*|## (.*?)|### (.*?))/g, (match, boldText, h2Text, h3Text) => {
-    const targetText = boldText || h2Text || h3Text;
-    return [...targetText].map(char => fontMapping[char] || char).join('');
-  });
+  return text.replace(/\*\*(.*?)\*\*/g, (_, boldText) =>
+    [...boldText].map(char => fontMapping[char] || char).join('')
+  );
 }
 
 module.exports = {
   name: "ai",
-  description: "interact with hersheyyy",
+  description: "interact with gpt4",
   author: "developer",
 
   async execute(senderId, args) {
@@ -44,16 +43,15 @@ module.exports = {
 };
 
 const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const systemRole = "You are 𝗛𝗲𝗿𝘀𝗵𝗲𝘆 𝗠𝗮𝗱𝗲𝗺𝗼𝗶𝘀𝗲𝗹𝗹𝗲 𝗔𝗜 , an AI assistant.";
-  const prompt = `${systemRole}\n${input}`;
-
-  const apiUrl = `https://jonell01-ccprojectsapihshs.hf.space/api/gpt4?ask=${encodeURIComponent(prompt)}&id=${encodeURIComponent(senderId)}`;
+  const apiUrl = `https://jonell01-ccprojectsapihshs.hf.space/api/gpt4?ask=${encodeURIComponent(input)}&id=${encodeURIComponent(senderId)}`;
 
   try {
     const { data } = await axios.get(apiUrl);
-    const formattedResponse = convertToBold(data || "No response from the AI.");
+    const responseText = data || "No response from the AI.";
 
-    await sendConcatenatedMessage(senderId, formattedResponse, pageAccessToken);
+    // Apply bold formatting
+    const formattedText = convertToBold(responseText);
+    await sendConcatenatedMessage(senderId, formattedText, pageAccessToken);
   } catch (error) {
     console.error("Error in GPT-4 CCProject command:", error);
     await sendError(senderId, "❌ Error: Something went wrong.", pageAccessToken);
