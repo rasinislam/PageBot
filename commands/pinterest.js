@@ -33,7 +33,7 @@ module.exports = {
 
       // Call the API – note that this uses the original endpoint.
       // If you prefer the new endpoint from the example, replace the URL accordingly.
-      const apiUrl = `https://ccprojectapis.ddns.net/api/pin?title=${encodeURIComponent(searchTerm)}&count=${numOfImages}`;
+      const apiUrl = `https://jonell01-ccprojectsapihshs.hf.space/api/pin?title=${encodeURIComponent(searchTerm)}&count=${numOfImages}`;
       console.log(`Fetching data from API: ${apiUrl}`);
       const response = await axios.get(apiUrl);
 
