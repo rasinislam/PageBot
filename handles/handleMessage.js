@@ -1,104 +1,144 @@
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios'); // Added axios for HTTP requests
 const { sendMessage } = require('./sendMessage');
 
+// Load command modules
 const commands = new Map();
-const lastImageByUser = new Map(); // Store the last image sent by each user
-const lastVideoByUser = new Map(); // Store the last video sent by each user
+const lastImageByUser = new Map();
+const lastVideoByUser = new Map();
 const prefix = '-';
 
-const commandFiles = fs.readdirSync(path.join(__dirname, '../commands')).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-  const command = require(`../commands/${file}`);
-  commands.set(command.name.toLowerCase(), command);
-}
+fs.readdirSync(path.join(__dirname, '../commands'))
+  .filter(file => file.endsWith('.js'))
+  .forEach(file => {
+    const command = require(`../commands/${file}`);
+    commands.set(command.name.toLowerCase(), command);
+  });
 
 async function handleMessage(event, pageAccessToken) {
-  if (!event || !event.sender || !event.sender.id) {
-    console.error('Invalid event object');
-    return;
-  }
+  const senderId = event?.sender?.id;
+  if (!senderId) return console.error('Invalid event object');
 
-  const senderId = event.sender.id;
+  const messageText = event?.message?.text?.trim();
+  const attachments = event?.message?.attachments || [];
 
-  if (event.message && event.message.attachments) {
-    const imageAttachment = event.message.attachments.find(att => att.type === 'image');
-    const videoAttachment = event.message.attachments.find(att => att.type === 'video');
+  // Detect current attachments if present
+  const imageAttachment = attachments.find(a => a.type === 'image');
+  const videoAttachment = attachments.find(a => a.type === 'video');
 
-    if (imageAttachment) {
-      lastImageByUser.set(senderId, imageAttachment.payload.url);
-    }
-    if (videoAttachment) {
-      lastVideoByUser.set(senderId, videoAttachment.payload.url);
-    }
-  }
+  const imageUrl = imageAttachment?.payload?.url;
+  const videoUrl = videoAttachment?.payload?.url;
 
-  if (event.message && event.message.text) {
-    const messageText = event.message.text.trim().toLowerCase();
+  // Save to cache
+  if (imageUrl) lastImageByUser.set(senderId, imageUrl);
+  if (videoUrl) lastVideoByUser.set(senderId, videoUrl);
 
-    
+  // Get latest media (prioritize current, fallback to previous)
+  const lastImage = imageUrl || lastImageByUser.get(senderId);
+  const lastVideo = videoUrl || lastVideoByUser.get(senderId);
+  const mediaToUpload = lastImage || lastVideo;
 
-    // Handling "gemini" command
-if (messageText.startsWith('cici')) {
-  const lastImage = lastImageByUser.get(senderId); // Retrieve the last image sent by the user
-  const args = messageText.split(/\s+/).slice(1); // Extract arguments from the command
+
+  if (!messageText) return console.log('Received message without text');
+
+  const [rawCommand, ...args] = messageText.startsWith(prefix)
+    ? messageText.slice(prefix.length).split(' ')
+    : messageText.split(' ');
+
+  const commandKey = rawCommand.toLowerCase();
+  const mediaCommands = ['remini', 'catmoe', 'imgbb', 'restore', 'ocr',  'removebg', 'gemini', 'imgur', 'zombie', 'blur', 'vampire'];
 
   try {
-    // Execute the "cici" command
-    await commands.get('cici').execute(senderId, args, pageAccessToken, event, lastImage);
+    console.log(`Received command: ${commandKey}, args: ${args.join(' ')}`);
 
-    // Clear the stored image after processing
-    lastImageByUser.delete(senderId);
-  } catch (error) {
-    console.error('Error while processing the Gemini command:', error);
-    // Send error feedback to the user
-    await sendMessage(
-      senderId, 
-      { text: '❌ An error occurred while processing your Gemini request. Please try again later.' }, 
-      pageAccessToken
-    );
-  }
-  return;
-}
+    if (mediaCommands.includes(commandKey)) {
+      switch (commandKey) {
+        case 'remini':
+        case 'restore':
+        case 'removebg':
+        case 'zombie':
+        case 'blur':
+        case 'vampire':
+          if (lastImage) {
+            await commands.get(commandKey).execute(senderId, [], pageAccessToken, lastImage);
+            lastImageByUser.delete(senderId);
+          } else {
+            await sendMessage(senderId, {
+              text: `❌ 𝖯𝗅𝖾𝖺𝗌𝖾 𝗌𝖾𝗇𝖽 𝖺𝗇 𝗂𝗆𝖺𝗀𝖾 𝖿𝗂𝗋𝗌𝗍, 𝗍𝗁𝖾𝗇 𝗍𝗒𝗉𝖾 "${commandKey}".`
+            }, pageAccessToken);
+          }
+          break;
 
-    // Other command processing logic....    let commandName, args;
-    if (messageText.startsWith(prefix)) {
-      const argsArray = messageText.slice(prefix.length).split(' ');
-      commandName = argsArray.shift().toLowerCase();
-      args = argsArray;
-    } else {
-      const words = messageText.split(' ');
-      commandName = words.shift().toLowerCase();
-      args = words;
-    }
+        case 'gemini':
+          await commands.get('gemini').execute(senderId, args, pageAccessToken, event, lastImage);
+          lastImageByUser.delete(senderId);
+          break;
 
-    if (commands.has(commandName)) {
-      const command = commands.get(commandName);
-      try {
-        await command.execute(senderId, args, pageAccessToken, sendMessage);
-      } catch (error) {
-        console.error(`Error executing command ${commandName}:`, error);
-        sendMessage(senderId, { text: `There was an error executing the command "${commandName}". Please try again later.` }, pageAccessToken);
+        case 'imgbb':
+          if (mediaToUpload) {
+            await commands.get('imgbb').execute(senderId, [], pageAccessToken, mediaToUpload);
+            lastImageByUser.delete(senderId);
+            lastVideoByUser.delete(senderId);
+          } else {
+            await sendMessage(senderId, {
+              text: '❌ Please send an image or video first, then type "imgbb".'
+            }, pageAccessToken);
+          }
+          break;
+  case 'imgur':
+          if (mediaToUpload) {
+            await commands.get('imgur').execute(senderId, [], pageAccessToken, mediaToUpload);
+            lastImageByUser.delete(senderId);
+            lastVideoByUser.delete(senderId);
+          } else {
+            await sendMessage(senderId, {
+              text: '❌ Please send an image or video first, then type "imgur".'
+            }, pageAccessToken);
+          }
+          break;
+  case 'ocr':
+          if (mediaToUpload) {
+            await commands.get('ocr').execute(senderId, [], pageAccessToken, mediaToUpload);
+            lastImageByUser.delete(senderId);
+            lastVideoByUser.delete(senderId);
+          } else {
+            await sendMessage(senderId, {
+              text: '❌ Please send an image first, then type "ocr".'
+            }, pageAccessToken);
+          }
+          break;
+  case 'catmoe':
+          if (mediaToUpload) {
+            await commands.get('catmoe').execute(senderId, [], pageAccessToken, mediaToUpload);
+            lastImageByUser.delete(senderId);
+            lastVideoByUser.delete(senderId);
+          } else {
+            await sendMessage(senderId, {
+              text: '❌ Please send an image first, then type "ocr".'
+            }, pageAccessToken);
+          }
+          break;
       }
       return;
     }
 
-    const aiCommand = commands.get('ai');
-    if (aiCommand) {
-      try {
-        await aiCommand.execute(senderId, [messageText], pageAccessToken);
-      } catch (error) {
-        console.error('Error executing Ai command:', error);
-        sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
-      }
+    // Normal command
+    if (commands.has(commandKey)) {
+      await commands.get(commandKey).execute(senderId, args, pageAccessToken, event, sendMessage);
+    } else if (commands.has('ai')) {
+      await commands.get('ai').execute(senderId, [messageText], pageAccessToken, event, sendMessage);
+    } else {
+      await sendMessage(senderId, {
+        text: '❓ Unknown command and AI fallback is unavailable.'
+      }, pageAccessToken);
     }
-  } else if (event.message) {
-    console.log('Received message without text');
-  } else {
-    console.log('Received event without message');
+
+  } catch (error) {
+    console.error(`Error executing command "${commandKey}":`, error);
+    await sendMessage(senderId, {
+      text: error.message || `❌ There was an error executing "${commandKey}".`
+    }, pageAccessToken);
   }
 }
 
 module.exports = { handleMessage };
-
