@@ -23,38 +23,38 @@ function convertToBold(text) {
 
 module.exports = {
   name: "ai",
-  description: "interact with gpt4",
+  description: "Chat with GPT-4  API",
   author: "developer",
 
   async execute(senderId, args) {
     const pageAccessToken = token;
-    const userPrompt = (args.join(" ") || "Hello").trim();
+    const userPrompt = (args.join(" ") || "").trim();
 
     if (!userPrompt) {
       return sendMessage(
         senderId,
-        { text: "𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝘆𝗼𝘂𝗿 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻." },
+        { text: "❌ 𝗘𝗿𝗿𝗼𝗿: 𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗾𝘂𝗲𝗿𝘆.\n𝗘𝘅𝗮𝗺𝗽𝗹𝗲: gptt who are you" },
         pageAccessToken
       );
     }
 
-    await handleChatResponse(senderId, userPrompt, pageAccessToken);
+    await handleRapidoChat(senderId, userPrompt, pageAccessToken);
   },
 };
 
-const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const apiUrl = `https://jonell01-ccprojectsapihshs.hf.space/api/gpt4?ask=${encodeURIComponent(input)}&id=${encodeURIComponent(senderId)}`;
+const handleRapidoChat = async (senderId, input, pageAccessToken) => {
+  const apiUrl = `https://rapido.zetsu.xyz/api/o3-mini?query=${encodeURIComponent(input)}`;
 
   try {
     const { data } = await axios.get(apiUrl);
-    const responseText = data || "No response from the AI.";
+    const responseText = data?.response || "❌ 𝗘𝗿𝗿𝗼𝗿: 𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗚𝗣𝗧-𝟰 𝗔𝗣𝗜.";
 
-    // Apply bold formatting
-    const formattedText = convertToBold(responseText);
+    const formattedText = convertToBold(`🤖 | GPT-4\n─────────────\n${responseText}\n─────────────`);
     await sendConcatenatedMessage(senderId, formattedText, pageAccessToken);
+
   } catch (error) {
-    console.error("Error in GPT-4 CCProject command:", error);
-    await sendError(senderId, "❌ Error: Something went wrong.", pageAccessToken);
+    console.error("Error in gptt command:", error.message);
+    await sendError(senderId, "❌ 𝗘𝗿𝗿𝗼𝗿: 𝗙𝗮𝗶𝗹𝗲𝗱 𝘁𝗼 𝗿𝗲𝗮𝗰𝗵 𝘁𝗵𝗲 𝗚𝗣𝗧-𝟰 𝗔𝗣𝗜.", pageAccessToken);
   }
 };
 
@@ -65,7 +65,7 @@ const sendConcatenatedMessage = async (senderId, text, pageAccessToken) => {
     const messages = splitMessageIntoChunks(text, maxMessageLength);
 
     for (const message of messages) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
       await sendMessage(senderId, { text: message }, pageAccessToken);
     }
   } else {
@@ -83,4 +83,4 @@ const splitMessageIntoChunks = (message, chunkSize) => {
 
 const sendError = async (senderId, errorMessage, pageAccessToken) => {
   await sendMessage(senderId, { text: errorMessage }, pageAccessToken);
-}; 
+};
