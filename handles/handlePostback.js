@@ -7,7 +7,7 @@ const handlePostback = async (event, pageAccessToken) => {
   if (!senderId || !payload) return console.error('Invalid postback event object');
 
   try {
-    await sendMessage(senderId, { text: `Welcome to Cici Assistant Fb page version ✨💁\n\n*Ask me anything\nor\n*Send image and type cici what is this?` }, pageAccessToken);
+    await sendMessage(senderId, { text: `Welcome` }, pageAccessToken);
   } catch (err) {
     console.error('Error sending postback response:', err.message || err);
   }
