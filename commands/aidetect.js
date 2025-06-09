@@ -14,7 +14,7 @@ module.exports = {
       }, pageAccessToken);
     }
 
-    const apiUrl = `https://kaiz-apis.gleeze.com/api/aidetector?q=${encodeURIComponent(query)}&apikey=ec7d563d-adae-4048-af08-0a5252f336d1`;
+    const apiUrl = `https://kaiz-apis.gleeze.com/api/aidetector?q=${encodeURIComponent(query)}&apikey=YOUR_APIKEY`;
 
     try {
       const { data } = await axios.get(apiUrl, {
