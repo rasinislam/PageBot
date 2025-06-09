@@ -16,7 +16,7 @@ module.exports = {
     await sendMessage(senderId, { text: '⌛ 𝗘𝗻𝗵𝗮𝗻𝗰𝗶𝗻𝗴 𝗶𝗺𝗮𝗴𝗲 𝗽𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁...' }, pageAccessToken);
 
     try {
-      const enhanceUrl = `https://kaiz-apis.gleeze.com/api/upscale?imageUrl=${encodeURIComponent(imageUrl)}&apikey=ec7d563d-adae-4048-af08-0a5252f336d1`;
+      const enhanceUrl = `https://kaiz-apis.gleeze.com/api/upscale?imageUrl=${encodeURIComponent(imageUrl)}&apikey=YOUR_APIKEY`;
 
       await sendMessage(senderId, {
         attachment: {
