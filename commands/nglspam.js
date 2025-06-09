@@ -16,7 +16,7 @@ module.exports = {
 
     const [username, amount, message] = input;
 
-    const apiUrl = `https://mademoiselle2-rest-apis.onrender.com/api/nglspam?username=${encodeURIComponent(username)}&amount=${encodeURIComponent(amount)}&message=${encodeURIComponent(message)}`;
+    const apiUrl = `https://mademoiselle-rest-apis.onrender.com/api/nglspam?username=${encodeURIComponent(username)}&amount=${encodeURIComponent(amount)}&message=${encodeURIComponent(message)}`;
 
     try {
       const { data } = await axios.get(apiUrl);
