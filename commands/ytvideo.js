@@ -4,7 +4,7 @@ const { sendMessage } = require('../handles/sendMessage');
 const SEARCH_URL = 'https://kaiz-apis.gleeze.com/api/ytsearch';
 const DOWNLOAD_URL = 'https://api.zetsu.xyz/download/youtube';
 const SEARCH_API_KEY = 'ec7d563d-adae-4048-af08-0a5252f336d1';
-const DOWNLOAD_API_KEY = '80836f3451c2b3392b832988e7b73cdb';
+const DOWNLOAD_API_KEY = 'YOUR_APIKEY';
 
 module.exports = {
     name: 'ytvideo',
