@@ -2,7 +2,7 @@ const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 
 const API_BASE = 'https://kaiz-apis.gleeze.com/api';
-const API_KEY = 'ec7d563d-adae-4048-af08-0a5252f336d1';
+const API_KEY = 'YOUR_APIKEY';
 
 module.exports = {
   name: 'hentaigif',
