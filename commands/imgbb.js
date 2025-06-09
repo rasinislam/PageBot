@@ -18,7 +18,7 @@ module.exports = {
     }, pageAccessToken);
 
     try {
-      const response = await axios.get(`https://kaiz-apis.gleeze.com/api/imgbb?url=${encodeURIComponent(imageUrl)}&apikey=ec7d563d-adae-4048-af08-0a5252f336d1`);
+      const response = await axios.get(`https://kaiz-apis.gleeze.com/api/imgbb?url=${encodeURIComponent(imageUrl)}&apikey=YOUR_APIKEY`);
       const imgbbLink = response?.data?.link;
 
       if (!imgbbLink) {
