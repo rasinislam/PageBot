@@ -9,7 +9,7 @@ module.exports = {
 
   async execute(senderId, args, pageAccessToken) {
     try {
-      const res = await axios.get('https://mademoiselle2-rest-apis.onrender.com/api/animequotes');
+      const res = await axios.get('https://mademoiselle-rest-apis.onrender.com/api/animequotes');
       const { character, quote } = res.data;
 
       await sendMessage(senderId, {
