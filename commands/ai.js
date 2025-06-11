@@ -24,8 +24,8 @@ function convertToBold(text) {
 module.exports = {
   name: "ai",
   description: "Chat with GPT-4  API",
-  category: 'ai',
-  author: "developer",
+  category: 'AI',
+  author: "Developer Rasin",
 
   async execute(senderId, args) {
     const pageAccessToken = token;
@@ -34,7 +34,7 @@ module.exports = {
     if (!userPrompt) {
       return sendMessage(
         senderId,
-        { text: "❌ 𝗘𝗿𝗿𝗼𝗿: 𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗾𝘂𝗲𝗿𝘆.\n𝗘𝘅𝗮𝗺𝗽𝗹𝗲: gptt who are you" },
+        { text: "𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗾𝘂𝗲𝗿𝘆" },
         pageAccessToken
       );
     }
@@ -44,13 +44,13 @@ module.exports = {
 };
 
 const handleRapidoChat = async (senderId, input, pageAccessToken) => {
-  const apiUrl = `https://rapido.zetsu.xyz/api/o3-mini?query=${encodeURIComponent(input)}`;
+  const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/gpt4.1?message=${encodeURIComponent(input)}`;
 
   try {
     const { data } = await axios.get(apiUrl);
-    const responseText = data?.response || "❌ 𝗘𝗿𝗿𝗼𝗿: 𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗚𝗣𝗧-𝟰 𝗔𝗣𝗜.";
+    const responseText = data?.message || "𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗚𝗣𝗧-𝟰";
 
-    const formattedText = convertToBold(`🤖 | GPT-4\n─────────────\n${responseText}\n─────────────`);
+    const formattedText = convertToBold(`🤭 | GPT-4.1\n─────────────\n${responseText}\n─────────────`);
     await sendConcatenatedMessage(senderId, formattedText, pageAccessToken);
 
   } catch (error) {
