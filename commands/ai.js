@@ -24,6 +24,7 @@ function convertToBold(text) {
 module.exports = {
   name: "ai",
   description: "Chat with GPT-4  API",
+  category: 'ai',
   author: "developer",
 
   async execute(senderId, args) {
