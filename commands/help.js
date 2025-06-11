@@ -4,57 +4,42 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'help',
-  description: 'show available commands',
+  description: 'Show all available commands',
   author: 'developer',
   execute(senderId, args, pageAccessToken) {
     const commandsDir = path.join(__dirname, '../commands');
     const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith('.js'));
 
-    const commands = commandFiles.map((file, index) => {
+    // Parse all commands with category
+    const commands = commandFiles.map(file => {
       const command = require(path.join(commandsDir, file));
       return {
-        title: command.name,
-        description: command.description,
-        payload: `${command.name.toUpperCase()}_PAYLOAD`
+        name: command.name,
+        description: command.description || '',
+        category: command.category || 'Misc'
       };
     });
 
-    const totalCommands = commandFiles.length;
-    const commandsPerPage = 25;
-    const totalPages = Math.ceil(totalCommands / commandsPerPage);
-    let page = parseInt(args[0], 20);
-
-    if (isNaN(page) || page < 1) {
-      page = 1;
+    // Group commands by category
+    const grouped = {};
+    for (const cmd of commands) {
+      const category = cmd.category;
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push(cmd.name);
     }
 
-    if (args[0] && args[0].toLowerCase() === 'all') {
-      const helpTextMessage = `𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀 𝗟𝗶𝘀𝘁\n𝗧𝗵𝗲 𝗧𝗼𝘁𝗮𝗹 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀: ${totalCommands}\n\n${commands.map((cmd, index) => `${index + 1}. ${cmd.title} - ${cmd.description}`).join('\n\n')}`;
+    const totalCommands = commands.length;
 
-      return sendMessage(senderId, {
-        text: helpTextMessage
-      }, pageAccessToken);
+    // Format final string
+    let output = `🛠️ 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀\n\n`;
+
+    for (const category in grouped) {
+      const list = grouped[category].map(cmd => `│ ➛ ${cmd}`).join('\n');
+      output += `╭─❍「 ${category} 」\n${list}\n╰─────────◊\n\n`;
     }
 
-    const startIndex = (page - 1) * commandsPerPage;
-    const endIndex = startIndex + commandsPerPage;
-    const commandsForPage = commands.slice(startIndex, endIndex);
+    output += `» 𝗧𝗼𝘁𝗮𝗹 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀:〔 ${totalCommands} 〕\n» 𝖳𝗒𝗉𝖾 "𝗁𝖾𝗅𝗉 [𝖼𝗈𝗆𝗆𝖺𝗇𝖽]" 𝗍𝗈 𝗌𝖾𝖾 𝗎𝗌𝖺𝗀𝖾.\n» 𝖥𝗈𝗋 𝗌𝗎𝗉𝗉𝗈𝗋𝗍, 𝗍𝗮𝗅𝗄 𝗍𝗈 𝗍𝗁𝖾 𝗗𝗲𝘃.`;
 
-    if (commandsForPage.length === 0) {
-      return sendMessage(senderId, { text: `Invalid page number. There are only ${totalPages} pages.` }, pageAccessToken);
-    }
-
-    const helpTextMessage = `𝗖𝗼𝗺𝗺𝗮𝗻𝗱 𝗟𝗶𝘀𝘁 [ 𝗣𝗮𝗴𝗲 ${page} 𝗼𝗳 ${totalPages} ]:\n𝗧𝗵𝗲 𝗧𝗼𝘁𝗮𝗹 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀: ${totalCommands}\n\n${commandsForPage.map((cmd, index) => `${startIndex + index + 1}. ${cmd.title} - ${cmd.description}`).join('\n\n')}\n\n𝗧𝘆𝗽𝗲 "𝗵𝗲𝗹𝗽 [𝗽𝗮𝗴𝗲 𝗻𝘂𝗺𝗯𝗲𝗿] " 𝘁𝗼 𝘀𝗲𝗲 𝗮𝗻𝗼𝘁𝗵𝗲𝗿 𝗽𝗮𝗴𝗲 𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀 𝗮𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲..`;
-
-    const quickRepliesPage = commandsForPage.map((cmd) => ({
-      content_type: "text",
-      title: cmd.title,
-      payload: cmd.payload
-    }));
-
-    sendMessage(senderId, {
-      text: helpTextMessage,
-      quick_replies: quickRepliesPage
-    }, pageAccessToken);
+    return sendMessage(senderId, { text: output }, pageAccessToken);
   }
 };
