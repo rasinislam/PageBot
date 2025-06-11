@@ -125,9 +125,11 @@ async function handleMessage(event, pageAccessToken) {
     // Normal command
     if (commands.has(commandKey)) {
       await commands.get(commandKey).execute(senderId, args, pageAccessToken, event, sendMessage);
+    } else if (commands.has('jeba')) {
+      await commands.get('jeba').execute(senderId, [messageText], pageAccessToken, event, sendMessage);
     } else {
       await sendMessage(senderId, {
-        text: '❓ Unknown command and AI fallback is unavailable.'
+        text: '𝚃𝚑𝚎 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚢𝚘𝚞 𝚊𝚛𝚎 𝚞𝚜𝚒𝚗𝚐 𝚍𝚘𝚎𝚜 𝚗𝚘𝚝 𝚎𝚡𝚒𝚜𝚝, 𝚝𝚢𝚙𝚎 𝚑𝚎𝚕𝚙 𝚝𝚘 𝚜𝚎𝚎 𝚊𝚕𝚕 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎 𝚌𝚘𝚖𝚖𝚊𝚗𝚍𝚜 ✨'
       }, pageAccessToken);
     }
 
