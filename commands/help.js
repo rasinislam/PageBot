@@ -6,7 +6,7 @@ module.exports = {
   name: 'help',
   description: 'Show available commands or details of one',
   category: 'system',
-  author: 'developer',
+  author: 'Developer Rasin',
   execute(senderId, args, pageAccessToken) {
     const commandsDir = path.join(__dirname, '../commands');
     const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith('.js'));
@@ -16,7 +16,7 @@ module.exports = {
       return {
         name: cmd.name,
         description: cmd.description || 'No description',
-        category: cmd.category || 'Misc',
+        category: cmd.category || '🙃',
         author: cmd.author || 'unknown',
         usage: cmd.usage || `${cmd.name}`
       };
@@ -62,8 +62,8 @@ module.exports = {
     let msg = `🛠️ 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀\n\n`;
 
     for (const [cat, cmds] of Object.entries(categories)) {
-      const icon = emojiMap[cat] || '📁';
-      msg += `╭─❍「 ${icon} 𝗛𝗲𝗹𝗽 - ${cat} 」\n`;
+      const icon = emojiMap[cat] || '';
+      msg += `╭─❍「 ${icon} ${cat} 」\n`;
       cmds.sort().forEach(cmd => {
         msg += `│ ➛ ${cmd}\n`;
       });
