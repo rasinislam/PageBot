@@ -125,8 +125,6 @@ async function handleMessage(event, pageAccessToken) {
     // Normal command
     if (commands.has(commandKey)) {
       await commands.get(commandKey).execute(senderId, args, pageAccessToken, event, sendMessage);
-    } else if (commands.has('ai')) {
-      await commands.get('ai').execute(senderId, [messageText], pageAccessToken, event, sendMessage);
     } else {
       await sendMessage(senderId, {
         text: '❓ Unknown command and AI fallback is unavailable.'
