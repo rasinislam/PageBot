@@ -2,37 +2,45 @@ const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
-  name: 'sim',
-  description: 'Talk with the Sim API.',
-  async execute(senderId, args, pageAccessToken) {
-    const query = args.join(' ');
-
-    if (!query) {
-      return sendMessage(senderId, {
-        text: 'Error: Please provide a message.\nExample: sim Hello!'
-      }, pageAccessToken);
-    }
+  name: 'jeba',
+  description: 'Jeba AI teach & chat command',
+  category: 'Simsimi',
+  async execute(senderId, args, pageAccessToken, event, sendMessage) {
+    const msg = args.join(' ').trim();
 
     try {
-      const apiKey = '2a5a2264d2ee4f0b847cb8bd809ed34bc3309be7';
-      const apiUrl = `https://simsimi.ooguy.com/sim?query=${encodeURIComponent(query)}&apikey=${apiKey}`;
-      const { data } = await axios.get(apiUrl);
+      
+      if (/^teach\s+.+=>.+/i.test(msg)) {
+        const [, ask, reply] = msg.match(/^teach\s+(.+?)\s*=>\s*(.+)/i) || [];
+        if (!ask || !reply) {
+          return sendMessage(senderId, { text: 'Usage: jeba teach <ask> => <reply1, reply2, ...>' }, pageAccessToken);
+        }
 
-      if (!data || !data.respond) {
-        return sendMessage(senderId, {
-          text: 'Error: No response from Sim API.'
-        }, pageAccessToken);
+        const res = await axios.get('https://rasin-x-apis-main.onrender.com/api/rasin/jeba', {
+          params: { ask, reply }
+        });
+
+        return sendMessage(senderId, { text: res.data.message || '' }, pageAccessToken);
       }
 
-      return sendMessage(senderId, {
-        text: `${data.respond}`
-      }, pageAccessToken);
+    
+      if (/^list$/i.test(msg)) {
+        const res = await axios.get('https://rasin-x-apis-main.onrender.com/api/rasin/jeba', {
+          params: { count: true }
+        });
 
-    } catch (error) {
-      console.error('sim command error:', error.message);
-      await sendMessage(senderId, {
-        text: 'Error: Failed to connect to Sim API.'
-      }, pageAccessToken);
+        return sendMessage(senderId, { text: res.data.message || '' }, pageAccessToken);
+      }
+
+    
+      const res = await axios.get('https://rasin-x-apis-main.onrender.com/api/rasin/jeba', {
+        params: { msg }
+      });
+
+      return sendMessage(senderId, { text: res.data.response || '' }, pageAccessToken);
+    } catch (err) {
+      console.error('Jeba error:', err);
+      return sendMessage(senderId, { text: 'Error occurred.' }, pageAccessToken);
     }
   }
 };
