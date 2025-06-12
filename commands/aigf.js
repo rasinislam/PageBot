@@ -31,7 +31,7 @@ category: 'AI',
       const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/jeba-ai?message=${encodeURIComponent(query)}`;
       const { data } = await axios.get(apiUrl);
 
-      if (!data.message) {
+      if (!data.response) {
         return sendMessage(senderId, {
           text: '𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗔𝗜.'
         }, pageAccessToken);
