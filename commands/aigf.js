@@ -28,10 +28,10 @@ category: 'AI',
     }
 
     try {
-      const apiUrl = `https://zen-api.gleeze.com/api/aigf?message=${encodeURIComponent(query)}`;
+      const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/jeba-ai?message=${encodeURIComponent(query)}`;
       const { data } = await axios.get(apiUrl);
 
-      if (!data.response) {
+      if (!data.message) {
         return sendMessage(senderId, {
           text: '𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗔𝗜.'
         }, pageAccessToken);
