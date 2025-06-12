@@ -12,16 +12,18 @@ function splitMessageIntoChunks(message, chunkSize) {
 
 module.exports = {
   name: 'aigf',
-  description: 'Get a reply from  Aigf.',
+  description: 'Chat with Ai Girlfriend',
   usage: 'aigf <message>',
-  author: 'Ry Dev',
+category: 'AI',
+
+  author: 'Developer Rasin',
 
   async execute(senderId, args, pageAccessToken) {
     const query = args.join(' ');
 
     if (!query) {
       return sendMessage(senderId, {
-        text: '𝗘𝗿𝗿𝗼𝗿: 𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗺𝗲𝘀𝘀𝗮𝗴𝗲.\n𝗘𝘅𝗮𝗺𝗽𝗹𝗲: aigf hello'
+        text: '𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗺𝗲𝘀𝘀𝗮𝗴𝗲'
       }, pageAccessToken);
     }
 
@@ -31,7 +33,7 @@ module.exports = {
 
       if (!data.response) {
         return sendMessage(senderId, {
-          text: '𝗘𝗿𝗿𝗼𝗿: 𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗔𝗜𝗚𝗙.'
+          text: '𝗡𝗼 𝗿𝗲𝘀𝗽𝗼𝗻𝘀𝗲 𝗳𝗿𝗼𝗺 𝗔𝗜.'
         }, pageAccessToken);
       }
 
@@ -40,18 +42,14 @@ module.exports = {
 
       for (let i = 0; i < messages.length; i++) {
         await sendMessage(senderId, {
-          text: i === 0 ? `
-🤖| 𝗔𝗜𝗚𝗙:
-─────────────
-${messages[i]}
-─────────────` : messages[i]
+          text: i === 0 ? `${messages[i]}` : messages[i]
         }, pageAccessToken);
       }
 
     } catch (error) {
       console.error('aigf command error:', error.message);
       await sendMessage(senderId, {
-        text: '𝗘𝗿𝗿𝗼𝗿: 𝗖𝗼𝘂𝗹𝗱 𝗻𝗼𝘁 𝗿𝗲𝗮𝗰𝗵 𝗭𝗲𝗻 𝗔𝗣𝗜.'
+        text: '𝗖𝗼𝘂𝗹𝗱 𝗻𝗼𝘁 𝗿𝗲𝗮𝗰𝗵 𝗔𝗣𝗜.'
       }, pageAccessToken);
     }
   }
