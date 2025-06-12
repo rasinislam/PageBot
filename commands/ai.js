@@ -1,7 +1,6 @@
 const axios = require("axios");
 const { sendMessage } = require("../handles/sendMessage");
 const fs = require("fs");
-
 const token = fs.readFileSync("token.txt", "utf8");
 
 const fontMapping = {
