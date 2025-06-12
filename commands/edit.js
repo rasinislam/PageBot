@@ -1,45 +1,52 @@
-const axios = require("axios");
-const { sendMessage } = require("../handles/sendMessage");
+const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
-  name: "edit",
-  aliases: ["editz"],
-  description: "Edits an image using prompt and image URL",
-  usage: "edit <prompt> (reply with image)",
-  author: "Developer Rasin",
-  category: "Image Generation",
+  name: 'edit',
+  description: 'edit <prompt> (Reply to an image)',
+  usage: 'edit <prompt>',
+  author: 'The Bf of Nusrat',
 
   async execute(senderId, args, pageAccessToken, event) {
-    const prompt = args.join(" ");
-    if (!prompt) {
-      return sendMessage(senderId, { text: "𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚊 𝚙𝚛𝚘𝚖𝚙𝚝" }, pageAccessToken);
+    if (!args || args.length === 0) {
+      await sendMessage(senderId, { text: '❌ Please provide a prompt to edit the image.' }, pageAccessToken);
+      return;
     }
 
-    if (!event?.messageReply?.attachments?.length || event.messageReply.attachments[0].type !== "photo") {
-      return sendMessage(senderId, { text: "𝙿𝚕𝚎𝚊𝚜𝚎 𝚛𝚎𝚙𝚕𝚢 𝚊𝚗 𝚒𝚖𝚊𝚐𝚎" }, pageAccessToken);
+    const prompt = args.join(' ');
+
+    // Check for replied message
+    const reply = event?.message_reply || event?.reply_to?.message;
+    const attachments = reply?.attachments;
+
+    if (!attachments || attachments.length === 0 || attachments[0].type !== 'image') {
+      await sendMessage(senderId, { text: '❌ Please reply to an image to edit it.' }, pageAccessToken);
+      return;
     }
+
+    const imageUrl = attachments[0].payload.url;
+
+    const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/edit?prompt=${encodeURIComponent(prompt)}&url=${encodeURIComponent(imageUrl)}`;
 
     try {
-      const imgUrl = event.messageReply.attachments[0].url;
-      const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/edit?prompt=${encodeURIComponent(prompt)}&url=${encodeURIComponent(imgUrl)}`;
+      const response = await axios.get(apiUrl);
+      const outputUrl = response.data?.img_url;
 
-      const res = await axios.get(apiUrl);
-      const imageUrl = res.data.img_url;
-
-      if (!imageUrl) {
-        return sendMessage(senderId, { text: "𝙽𝚘 𝚒𝚖𝚊𝚐𝚎 𝚛𝚎𝚝𝚞𝚛𝚗𝚎𝚍 😐" }, pageAccessToken);
+      if (!outputUrl) {
+        await sendMessage(senderId, { text: '❌ Failed to generate edited image.' }, pageAccessToken);
+        return;
       }
 
       await sendMessage(senderId, {
         attachment: {
-          type: "image",
-          payload: { url: imageUrl }
+          type: 'image',
+          payload: { url: outputUrl }
         }
       }, pageAccessToken);
 
-    } catch (error) {
-      console.error("Edit command error:", error.message);
-      await sendMessage(senderId, { text: "𝙵𝚊𝚒𝚕𝚎𝚍 💔" }, pageAccessToken);
+    } catch (err) {
+      console.error('[EDIT CMD ERR]', err.message);
+      await sendMessage(senderId, { text: '⚠️ Error: Something went wrong while editing the image.' }, pageAccessToken);
     }
   }
 };
