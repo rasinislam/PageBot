@@ -4,7 +4,7 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'help',
-  description: 'Show available commands or details of one',
+  description: 'Show available commands and details',
   category: 'system',
   author: 'Developer Rasin',
   execute(senderId, args, pageAccessToken) {
@@ -17,14 +17,14 @@ module.exports = {
         name: cmd.name,
         description: cmd.description || 'No description',
         category: cmd.category || '🙃',
-        author: cmd.author || 'unknown',
+        author: cmd.author || 'Developer Rasin',
         usage: cmd.usage || `${cmd.name}`
       };
     });
 
     const totalCommands = allCommands.length;
 
-    // If specific command requested
+  
     if (args[0] && args[0].toLowerCase() !== 'all') {
       const query = args[0].toLowerCase();
       const cmd = allCommands.find(c => c.name.toLowerCase() === query);
@@ -33,11 +33,10 @@ module.exports = {
         return sendMessage(senderId, { text: `❌ No command found with name "${query}".` }, pageAccessToken);
       }
 
-      const info = `𝗖𝗼𝗺𝗺𝗮𝗻𝗱: ${cmd.name}\n𝗗𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻: ${cmd.description}\n𝗖𝗮𝘁𝗲𝗴𝗼𝗿𝘆: ${cmd.category}\n𝗔𝘂𝘁𝗵𝗼𝗿: ${cmd.author}\n𝗨𝘀𝗮𝗴𝗲: ${cmd.usage}`;
+      const info = `❍───────( ${cmd.name} )───────❍\n𝗖𝗼𝗺𝗺𝗮𝗻𝗱: ${cmd.name}\n𝗗𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻: ${cmd.description}\n𝗔𝘂𝘁𝗵𝗼𝗿: ${cmd.author}\n𝗨𝘀𝗮𝗴𝗲: ${cmd.usage}`;
       return sendMessage(senderId, { text: info }, pageAccessToken);
     }
 
-    // 🧠 Group commands by category
     const categories = {};
     for (const cmd of allCommands) {
       if (!categories[cmd.category]) {
@@ -58,8 +57,8 @@ module.exports = {
       'Misc': '📁'
     };
 
-    // 🧾 Build styled message
-    let msg = `🛠️ 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀\n\n`;
+    
+    let msg = `🎓 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀\n\n`;
 
     for (const [cat, cmds] of Object.entries(categories)) {
       const icon = emojiMap[cat] || '';
