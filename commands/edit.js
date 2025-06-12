@@ -29,6 +29,7 @@ module.exports = {
       const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/edit?prompt=${encodeURIComponent(prompt)}&url=${encodeURIComponent(imageUrl)}`;
       
       const response = await axios.get(apiUrl);
+      console.log('API Response:', response.data); // Debug log
       const editedImageUrl = response?.data?.img_url;
 
       if (!editedImageUrl) {
@@ -47,6 +48,25 @@ module.exports = {
 
     } catch (error) {
       console.error('❌ Error editing image:', error.response?.data || error.message);
+      
+      // Check if the error response contains the actual result
+      if (error.response?.data?.img_url) {
+        try {
+          await sendMessage(senderId, {
+            attachment: {
+              type: 'image',
+              payload: {
+                url: error.response.data.img_url,
+                is_reusable: true
+              }
+            }
+          }, pageAccessToken);
+          return;
+        } catch (sendError) {
+          console.error('Error sending image from error response:', sendError);
+        }
+      }
+      
       await sendMessage(senderId, {
         text: '𝙵𝚊𝚒𝚕𝚎𝚍 💔 An error occurred while editing the image. Please try again later.'
       }, pageAccessToken);
