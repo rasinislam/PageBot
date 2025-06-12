@@ -15,9 +15,10 @@ module.exports = {
 
     const prompt = args.join(' ');
 
-    // Check for replied message
-    const reply = event?.message_reply || event?.reply_to?.message;
-    const attachments = reply?.attachments;
+    // Log the whole event to check structure
+    console.log(JSON.stringify(event, null, 2));
+
+    const attachments = event?.message?.reply_to?.attachments;
 
     if (!attachments || attachments.length === 0 || attachments[0].type !== 'image') {
       await sendMessage(senderId, { text: '❌ Please reply to an image to edit it.' }, pageAccessToken);
