@@ -28,6 +28,10 @@ module.exports = {
     try {
       const apiUrl = `https://rasin-x-apis.onrender.com/api/rasin/edit?prompt=${encodeURIComponent(prompt)}&url=${encodeURIComponent(imageUrl)}`;
       
+      console.log('API URL:', apiUrl);
+      console.log('Image URL:', imageUrl);
+      console.log('Prompt:', prompt);
+      
       const response = await axios.get(apiUrl, {
         validateStatus: function (status) {
           return status < 600; // Accept any status code less than 600
@@ -37,26 +41,28 @@ module.exports = {
       console.log('API Response:', response.data);
       console.log('Status Code:', response.status);
       
+      // Check if API returned an error
+      if (response.data.error) {
+        throw new Error(`API Error: ${response.data.error} - ${response.data.message}`);
+      }
+      
       const editedImageUrl = response?.data?.img_url;
 
       if (!editedImageUrl) {
         throw new Error('𝙽𝚘 𝚒𝚖𝚊𝚐𝚎 𝚛𝚎𝚝𝚞𝚛𝚗𝚎𝚍 😐');
       }
 
+      console.log('Edited Image URL:', editedImageUrl);
+
+      // Try sending as a simple text message first to test
       await sendMessage(senderId, {
-        attachment: {
-          type: 'image',
-          payload: {
-            url: editedImageUrl,
-            is_reusable: true
-          }
-        }
+        text: `✅ 𝚈𝚘𝚞𝚛 𝚎𝚍𝚒𝚝𝚎𝚍 𝚒𝚖𝚊𝚐𝚎 𝚒𝚜 𝚛𝚎𝚊𝚍𝚢!\n\n${editedImageUrl}`
       }, pageAccessToken);
 
     } catch (error) {
-      console.error('❌ Error editing image:', error.response?.data || error.message);
+      console.error('❌ Error editing image:', error.message);
       await sendMessage(senderId, {
-        text: '𝙵𝚊𝚒𝚕𝚎𝚍 💔 An error occurred while editing the image. Please try again later.'
+        text: `𝙵𝚊𝚒𝚕𝚎𝚍 💔 ${error.message}`
       }, pageAccessToken);
     }
   }
